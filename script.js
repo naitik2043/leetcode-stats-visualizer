@@ -14,12 +14,12 @@ document.addEventListener("DOMContentLoaded", function () {
       alert("Username should not be empty");
       return false;
     }
-    const regex = /^[a-zA-Z0-9_-]{1,15}$/;
-    const isMatching = regex.test(username);
-    if (!isMatching) {
+    const regex = /^[a-zA-Z0-9_-]{1,30}$/;
+    if (!regex.test(username)) {
       alert("Invalid Username");
+      return false;
     }
-    return isMatching;
+    return true;
   }
 
   async function fetchUserDetails(username) {
@@ -27,13 +27,13 @@ document.addEventListener("DOMContentLoaded", function () {
       searchButton.textContent = "Searching...";
       searchButton.disabled = true;
 
-      const proxyUrl = "https://api.allorigins.win/raw?url=";
-      const targetUrl = "https://leetcode.com/graphql/";
+      const proxyUrl = "https://cors-anywhere.herokuapp.com/";
+      const targetUrl = "https://leetcode.com/graphql";
 
-      const myHeaders = new Headers();
-      myHeaders.append("content-type", "application/json");
+      const headers = new Headers();
+      headers.append("Content-Type", "application/json");
 
-      const graphql = JSON.stringify({
+      const graphqlQuery = JSON.stringify({
         query: `
           query userSessionProgress($username: String!) {
             allQuestionsCount { difficulty count }
@@ -47,19 +47,23 @@ document.addEventListener("DOMContentLoaded", function () {
         variables: { username: username },
       });
 
-      const requestOptions = {
+      const response = await fetch(proxyUrl + targetUrl, {
         method: "POST",
-        headers: myHeaders,
-        body: graphql,
-      };
+        headers: headers,
+        body: graphqlQuery,
+      });
 
-      const response = await fetch(proxyUrl + targetUrl, requestOptions);
       if (!response.ok) throw new Error("Unable to fetch user details");
 
       const parsedData = await response.json();
-      console.log("Logging data:", parsedData);
+
+      if (!parsedData.data || !parsedData.data.matchedUser) {
+        cardStatsContainer.innerHTML = `<div class="card"><p>User not found</p></div>`;
+        return;
+      }
 
       displayUserData(parsedData);
+
     } catch (error) {
       cardStatsContainer.innerHTML = `<div class="card"><p>${error.message}</p></div>`;
     } finally {
@@ -68,47 +72,48 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  function updateProgress(solved, total, label, circle) {
-    const progressDegree = (solved / total) * 360; // degrees
-    circle.style.setProperty("--progress-degree", `${progressDegree}deg`);
-    label.textContent = `${solved}/${total}`;
+  function animateProgress(circle, label, solved, total) {
+    let current = 0;
+    const increment = solved / 60;
+    const interval = setInterval(() => {
+      current += increment;
+      if (current >= solved) current = solved;
+      const degree = (current / total) * 360;
+      circle.style.setProperty("--progress-degree", `${degree}deg`);
+      label.textContent = `${Math.floor(current)}/${total}`;
+      if (current >= solved) clearInterval(interval);
+    }, 16);
   }
 
   function displayUserData(parsedData) {
-    const totalEasyQues = parsedData.data.allQuestionsCount[1].count;
-    const totalMediumQues = parsedData.data.allQuestionsCount[2].count;
-    const totalHardQues = parsedData.data.allQuestionsCount[3].count;
+    const totalEasy = parsedData.data.allQuestionsCount[1].count;
+    const totalMedium = parsedData.data.allQuestionsCount[2].count;
+    const totalHard = parsedData.data.allQuestionsCount[3].count;
 
-    const solvedTotalEasyQues = parsedData.data.matchedUser.submitStats.acSubmissionNum[1].count;
-    const solvedTotalMediumQues = parsedData.data.matchedUser.submitStats.acSubmissionNum[2].count;
-    const solvedTotalHardQues = parsedData.data.matchedUser.submitStats.acSubmissionNum[3].count;
+    const solvedEasy = parsedData.data.matchedUser.submitStats.acSubmissionNum[1].count;
+    const solvedMedium = parsedData.data.matchedUser.submitStats.acSubmissionNum[2].count;
+    const solvedHard = parsedData.data.matchedUser.submitStats.acSubmissionNum[3].count;
 
-    updateProgress(solvedTotalEasyQues, totalEasyQues, easyLabel, easyProgressCircle);
-    updateProgress(solvedTotalMediumQues, totalMediumQues, mediumLabel, mediumProgressCircle);
-    updateProgress(solvedTotalHardQues, totalHardQues, hardLabel, hardProgressCircle);
+    animateProgress(easyProgressCircle, easyLabel, solvedEasy, totalEasy);
+    animateProgress(mediumProgressCircle, mediumLabel, solvedMedium, totalMedium);
+    animateProgress(hardProgressCircle, hardLabel, solvedHard, totalHard);
 
-    const cardsData = [
+    const cards = [
       { label: "Overall Submissions", value: parsedData.data.matchedUser.submitStats.totalSubmissionNum[0].submissions },
       { label: "Overall Easy Submissions", value: parsedData.data.matchedUser.submitStats.totalSubmissionNum[1].submissions },
       { label: "Overall Medium Submissions", value: parsedData.data.matchedUser.submitStats.totalSubmissionNum[2].submissions },
       { label: "Overall Hard Submissions", value: parsedData.data.matchedUser.submitStats.totalSubmissionNum[3].submissions },
     ];
 
-    cardStatsContainer.innerHTML = cardsData
+    cardStatsContainer.innerHTML = cards
       .map(
-        (data) => `
-          <div class="card">
-            <h4>${data.label}</h4>
-            <p>${data.value}</p>
-          </div>`
+        data => `<div class="card"><h4>${data.label}</h4><p>${data.value}</p></div>`
       )
       .join("");
   }
 
   searchButton.addEventListener("click", function () {
     const username = usernameInput.value;
-    if (validateUsername(username)) {
-      fetchUserDetails(username);
-    }
+    if (validateUsername(username)) fetchUserDetails(username);
   });
 });
