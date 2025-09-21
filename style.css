@@ -2,39 +2,47 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
-  background-color: rgb(89, 90, 106);
-  color: white;
-  height: 100vh;
+  background-color: #1e1e2f; /* dark mode */
+  color: #e0e0e0;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 20px;
 }
 
 .container {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  background-color: rgb(69, 64, 64);
-  padding: 20px;
-  border-radius: 5px;
+  gap: 1.5rem;
+  background-color: #2b2b3c;
+  padding: 25px;
+  border-radius: 15px;
   width: 50%;
-  max-width: 600px;
+  max-width: 650px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease;
+}
+
+.container:hover {
+  transform: scale(1.02);
 }
 
 h1 {
   font-size: 2rem;
   text-align: center;
+  color: #ffcc00;
+  text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
 }
 
 .user-container {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  justify-content: start;
 }
 
 .user-input-container {
@@ -44,69 +52,109 @@ h1 {
 
 #user-input {
   width: 80%;
-  padding: 0.4rem;
-  border-radius: 5px;
+  padding: 0.5rem;
+  border-radius: 8px;
   border: none;
+  outline: none;
+  background-color: #3c3c4f;
+  color: #fff;
 }
 
 #search-btn {
-  padding: 0.4rem 1rem;
-  border-radius: 5px;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
-  background: #299f5d;
-  color: white;
+  background: linear-gradient(135deg, #ff6a00, #ffb347);
+  color: #fff;
   font-weight: bold;
+  transition: transform 0.2s ease, filter 0.3s ease;
+}
+
+#search-btn:hover {
+  transform: scale(1.05);
+  filter: brightness(1.2);
 }
 
 .circle {
-  width: 120px;
-  height: 120px;
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
-  border: 4px solid #299f5d;
+  border: 4px solid transparent;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 1rem;
-  color: white;
   font-weight: 700;
-  background: conic-gradient(#299f5d var(--progress-degree, 0deg), #283a2e 0deg);
+  color: #fff;
   flex-direction: column;
+  background: conic-gradient(#00c6ff 0deg, #3c3c4f 0deg);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  transition: transform 0.3s ease, background 0.5s ease;
 }
 
-.circle span {
-  position: relative;
-  z-index: 2;
+.circle:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+}
+
+.easy-progress {
+  background: conic-gradient(#00ff6a var(--progress-degree, 0deg), #3c3c4f 0deg);
+}
+
+.medium-progress {
+  background: conic-gradient(#ffd600 var(--progress-degree, 0deg), #3c3c4f 0deg);
+}
+
+.hard-progress {
+  background: conic-gradient(#ff3d3d var(--progress-degree, 0deg), #3c3c4f 0deg);
+}
+
+@keyframes fillProgress {
+  from { --progress-degree: 0deg; }
+  to { --progress-degree: 360deg; }
 }
 
 .progress {
   display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
   flex-wrap: wrap;
-  gap: 10px;
+  justify-content: space-evenly;
+  gap: 20px;
 }
 
 .stats-cards {
   margin-top: 2rem;
-  margin-bottom: 2rem;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 15px;
   justify-content: space-evenly;
+}
+
+.card {
+  background: linear-gradient(145deg, #4b4b63, #2b2b3c);
+  width: 45%;
+  max-width: 280px;
+  padding: 15px;
+  border-radius: 15px;
+  font-size: 1rem;
+  min-height: 5rem;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+  transition: transform 0.3s ease, background 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px) scale(1.02);
+  background: linear-gradient(145deg, #5c5ca3, #3c3c6f);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
 }
 
 h4 {
   font-size: 1rem;
+  color: #ffd600;
+  margin-bottom: 5px;
 }
 
-.card {
-  background-color: rgb(230, 146, 44);
-  width: 40%;
-  max-width: 290px;
-  padding: 10px;
-  border-radius: 10px;
-  font-size: 1rem;
-  min-height: 4rem;
+.circle span, .card p {
+  transition: all 0.5s ease;
 }
