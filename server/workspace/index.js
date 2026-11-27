@@ -123,7 +123,7 @@ async function handleAccountDeletion(req, res) {
     clearSessionCookie(res);
     return json(res, 200, {
       ok: true,
-      message: "Your account and its saved profiles, snapshots, goals and revision items have been deleted."
+      message: "Your account, saved profiles, snapshots, goals, revision items, Code Vault snippets and unused launch tickets have been deleted."
     });
   } catch (error) {
     if (isConfigurationError(error)) {
