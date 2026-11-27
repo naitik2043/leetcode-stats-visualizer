@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d18"><meta name="description" content="Create a LeetMetric account to access a personal coding analytics workspace.">
+  <title>Create account | LeetMetric</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/site.css">
+</head>
+<body><div id="site-header"></div>
+<main class="auth-page">
+  <section class="auth-story"><div class="page-kicker">START WITH CLARITY</div><h1>Build a habit<br><span>that compounds.</span></h1><p>Create your LeetMetric account and set up a personal workspace for the coding journey ahead.</p><div class="auth-points"><span><i>✳</i> Save your preferred LeetCode username</span><span><i>✳</i> Return to your dashboard in one click</span><span><i>✳</i> Keep account credentials separate from LeetCode</span></div></section>
+  <form class="auth-card" data-auth="signup">
+    <h2>Create your account</h2><p>It takes just a few details to get started.</p><div class="form-status" aria-live="polite"></div>
+    <div class="form-field"><label for="signup-name">Full name</label><input id="signup-name" name="name" autocomplete="name" minlength="2" maxlength="80" required></div>
+    <div class="form-field"><label for="signup-email">Email address</label><input id="signup-email" name="email" type="email" autocomplete="email" maxlength="254" required></div>
+    <div class="form-field"><label for="signup-password">Password</label><div class="password-wrap"><input id="signup-password" name="password" type="password" autocomplete="new-password" minlength="10" required><button class="password-toggle" type="button" data-target="signup-password">SHOW</button></div><span class="form-help">Use at least 10 characters. Maximum 72 UTF-8 bytes.</span></div>
+    <div class="form-field"><label for="signup-confirm">Confirm password</label><div class="password-wrap"><input id="signup-confirm" name="confirmPassword" type="password" autocomplete="new-password" required><button class="password-toggle" type="button" data-target="signup-confirm">SHOW</button></div></div>
+    <label class="checkbox-row"><input type="checkbox" name="terms" value="accepted" required><span>I agree to the <a class="text-link" href="/terms.html">Terms of Use</a> and acknowledge the <a class="text-link" href="/privacy.html">Privacy Policy</a>.</span></label>
+    <button class="primary-button" type="submit">Create account →</button>
+    <div class="form-switch">Already have an account? <a href="/login.html">Log in</a></div>
+    <div class="form-legal">Never use your LeetCode password here. Create a separate password for LeetMetric.</div>
+  </form>
+</main><div id="site-footer"></div>
+<script src="/site.js" defer></script></body></html>
