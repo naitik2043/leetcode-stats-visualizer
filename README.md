@@ -1,120 +1,210 @@
-# LeetMetric — LeetCode Stats Visualizer
+# LeetMetric — LeetCode Analytics & Progress Workspace
 
-A polished LeetCode profile dashboard that turns public problem-solving activity into a readable performance snapshot. The project is evolving from a static HTML/CSS/JavaScript prototype into a full-stack MERN application with a secure API layer, persistence, and optional AI-powered practice insights.
+LeetMetric is an independent LeetCode statistics dashboard with a growing account-based workspace. It helps developers understand public profile metrics, save a preferred username, and build a more consistent problem-solving routine.
 
-> **Implementation status:** This milestone delivers the redesigned responsive frontend and a working Vercel serverless LeetCode lookup endpoint. MongoDB persistence, authentication, historical tracking, React migration, and AI coaching are planned follow-up work and are not represented as completed features.
+**Live site:** https://leetmetric-sooty.vercel.app  
+**Repository:** https://github.com/naitik2043/leetcode-stats-visualizer
 
-## Product direction
+> **Implementation status:** The project currently uses a static multi-page frontend, Vercel Node.js functions, and Mongoose models for account and contact data. Account-related endpoints require the production environment variables listed below. This release is not yet a React/Express MERN application; React migration and an Express service are separate roadmap items.
 
-- Public LeetCode profile lookup with loading, empty, and error states.
-- Difficulty-wise solved questions and submission metrics.
-- Responsive dashboard with accessible navigation and clear information hierarchy.
-- Server-side integration boundary; no public CORS proxy in browser code.
-- Roadmap toward saved profiles, progress history, comparisons, and AI-generated study guidance.
+## Product pages
 
-## Stack and roadmap
-
-| Layer | Current foundation | Planned evolution |
+| Page | Route | Purpose |
 |---|---|---|
-| UI | HTML, CSS, JavaScript | React + Vite |
-| API | Vercel serverless route | Express API (optional migration) |
-| Database | Not wired yet | MongoDB + Mongoose |
-| AI | Not wired yet | Optional LLM-backed coaching endpoint |
-| Hosting | Vercel frontend + serverless API | MERN app with hosted API/database |
+| Home | `/` | Public LeetCode profile lookup and statistics overview |
+| Features | `/features.html` | Current capabilities and clearly labeled roadmap |
+| About | `/about.html` | Product purpose and principles |
+| FAQ | `/faq.html` | Product, profile, account, and privacy questions |
+| Contact | `/contact.html` | Validated contact form and GitHub issue link |
+| Log in | `/login.html` | Account sign-in |
+| Sign up | `/signup.html` | Account registration |
+| Forgot password | `/forgot-password.html` | Request an email reset link |
+| Reset password | `/reset-password.html` | Single-use password reset |
+| Dashboard | `/dashboard.html` | Signed-in profile workspace |
+| Privacy | `/privacy.html` | Privacy notice |
+| Terms | `/terms.html` | Terms of use |
 
-## Architecture direction
+## Current features
+
+- Public LeetCode username lookup without requesting LeetCode credentials.
+- Solved-problem counts by Easy, Medium, and Hard difficulty.
+- Accepted submissions, total submissions, and acceptance-rate overview.
+- Responsive product navigation, account pages, and consistent footer.
+- MongoDB-backed registration, login, logout, current-session, and saved-profile endpoints.
+- Password hashing with bcryptjs and signed HttpOnly session cookies.
+- Password-reset token flow with expiry and single-use semantics.
+- Validated contact-message persistence.
+- Server-side LeetCode GraphQL request with username validation, upstream timeout, and short-lived cache.
+- SEO sitemap, robots rules, favicon, and baseline security response headers.
+
+Account and contact features return a clear service-unavailable response until the MongoDB and JWT environment variables are configured. Password recovery additionally requires a verified sender and Resend API key.
+
+## Architecture
 
 ```text
-React / Browser UI
-       |
-       v
-Node.js + Express API
-       |
-       +------ LeetCode GraphQL integration
-       |
-       +------ MongoDB (saved profiles and snapshots)
-       |
-       +------ AI insights service (optional)
+Browser
+  |
+  +-- Static HTML / CSS / JavaScript pages
+  |
+  +-- Vercel Node.js Functions
+        |
+        +-- /api/leetcode/:username
+        |      +-- LeetCode GraphQL
+        |
+        +-- /api/auth/*
+        |      +-- bcryptjs password hashing
+        |      +-- JWT in HttpOnly cookie
+        |      +-- Mongoose User model
+        |
+        +-- /api/user/profile
+        |      +-- Saved LeetCode username
+        |
+        +-- /api/contact
+               +-- Mongoose ContactMessage model
+                         |
+                         v
+                      MongoDB
 ```
 
-The frontend calls `GET /api/leetcode/:username`. The Vercel serverless function validates the username, queries LeetCode server-side, normalizes the payload, applies a 10-second upstream timeout, and caches data in memory briefly per function instance. The API returns normalized statistics:
+### Authentication model
 
-```json
-{
-  "username": "example",
-  "stats": {
-    "totalSolved": 120,
-    "solved": { "easy": 55, "medium": 55, "hard": 10 },
-    "totalQuestions": { "easy": 900, "medium": 1900, "hard": 800 },
-    "acceptedTotal": 240,
-    "submissionTotal": 360,
-    "acceptedSubmissions": { "all": 240, "easy": 100, "medium": 110, "hard": 30 },
-    "totalSubmissions": { "all": 360, "easy": 140, "medium": 170, "hard": 50 }
-  }
-}
-```
+- Passwords are hashed with bcryptjs (12 salt rounds); plaintext passwords are never persisted.
+- Session tokens are signed with `JWT_SECRET` and stored in an HttpOnly, SameSite=Lax cookie. The cookie is Secure in production.
+- Logout expires the session cookie.
+- Password reset uses a random token, stores only its SHA-256 hash, expires after 15 minutes, and invalidates older sessions after a successful reset.
+- Mutating routes verify the request origin and validate their input.
+- Current rate limits are in-memory per serverless function instance. Use a shared Redis-backed limiter before higher-traffic production use.
 
-Values above are illustrative only; the API should return validated upstream data.
+## Technology
 
-## Run the current frontend
+| Layer | Technology |
+|---|---|
+| Frontend | HTML5, CSS3, Vanilla JavaScript |
+| API runtime | Node.js on Vercel Functions |
+| Database ODM | Mongoose |
+| Database | MongoDB |
+| Password security | bcryptjs |
+| Session signing | jsonwebtoken |
+| Hosting | Vercel |
+| LeetCode data | LeetCode public GraphQL endpoint |
+| Password reset email | Resend (optional, requires configuration) |
+
+## Run locally
+
+### Prerequisites
+
+- Node.js 20 or later
+- npm
+- MongoDB Atlas cluster or local MongoDB
+- Vercel CLI
+
+### Installation
 
 ```bash
 git clone https://github.com/naitik2043/leetcode-stats-visualizer.git
 cd leetcode-stats-visualizer
+npm install
+cp .env.example .env
 ```
 
-Open `index.html` with VS Code Live Server or another static server. A Vercel serverless route is included at `/api/leetcode/[username]`. It validates usernames, queries LeetCode from the server, normalizes the response, and uses short-lived in-memory caching. The browser never calls a public CORS proxy. The cache is instance-local and should be replaced with shared Redis or another durable cache when scaling.
+Fill in the environment variables in `.env`, then start the app:
 
-## Future API environment
-
-When the Express service is implemented, keep credentials on the server and create a local `.env` file. Never commit secrets.
-
-```env
-PORT=5000
-MONGODB_URI=
-CLIENT_ORIGIN=http://localhost:5173
-AI_API_KEY=
-AI_MODEL=
+```bash
+npm run dev
 ```
+
+The Vercel local development server will print the local URL (typically `http://localhost:3000`).
+
+### Environment variables
+
+| Variable | Required | Description |
+|---|---:|---|
+| `MONGODB_URI` | Yes, for accounts/contact | MongoDB connection string |
+| `JWT_SECRET` | Yes, for sessions | Random secret with at least 32 characters |
+| `RESEND_API_KEY` | For password reset | Resend API key |
+| `EMAIL_FROM` | For password reset | Verified sender address in Resend |
+| `APP_URL` | Recommended | Canonical public application URL |
+
+Generate a strong session secret locally:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
+```
+
+Do not commit `.env`, production secrets, MongoDB credentials, or API keys. Add the values in **Vercel → Project → Settings → Environment Variables** for Production, Preview, and Development as required. Redeploy after adding or changing variables.
+
+### MongoDB setup notes
+
+1. Create a MongoDB Atlas cluster and a database user with a strong password.
+2. Add the connection URI as `MONGODB_URI`.
+3. Configure Atlas network access for the deployment environment; avoid broad network access unless you understand the exposure and have compensating controls.
+4. Keep the database user scoped to the LeetMetric database and its required collections.
+
+### Password reset email setup
+
+Configure a Resend account, verify the sending domain/address, then add `RESEND_API_KEY` and `EMAIL_FROM` in Vercel. Until those values exist, the reset endpoint reports that email delivery is not configured instead of pretending an email was sent.
+
+## API reference
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/leetcode/:username` | Read public LeetCode stats |
+| POST | `/api/auth/signup` | Create an account |
+| POST | `/api/auth/login` | Start a session |
+| POST | `/api/auth/logout` | End a session |
+| GET | `/api/auth/me` | Get the current account |
+| POST | `/api/auth/forgot-password` | Request a reset email |
+| POST | `/api/auth/reset-password` | Set a new password |
+| GET / POST | `/api/user/profile` | Read or save a preferred username |
+| POST | `/api/contact` | Store a validated contact request |
+
+## Quality checks
+
+Run JavaScript syntax checks for the frontend, server helpers, and API handlers:
+
+```bash
+npm run check
+```
+
+The project should also be tested with a configured MongoDB database and a non-production email sender before enabling public account registration. Test successful signup/login/logout, duplicate email handling, invalid credentials, expired sessions, saved profile validation, reset token expiry/reuse, and contact form validation.
 
 ## Roadmap
 
-### Foundation
-- [x] Replace the basic centered card with a responsive product dashboard.
-- [x] Improve header, navigation, footer, metadata, and mobile layouts.
-- [x] Remove the fragile public CORS proxy from browser code.
-- [x] Define a normalized API response and clear request states.
-- [x] Add a serverless profile lookup endpoint with validation, timeout, and short-lived in-memory caching.
+### Product and analytics
+- [ ] React + Vite component-based frontend migration.
+- [ ] Historical LeetCode snapshots and time-series charts.
+- [ ] Profile comparison and community leaderboards.
+- [ ] Topic-level practice planning and activity history.
+- [ ] Exportable profile reports.
 
-### MERN platform
-- [ ] Migrate the UI to React + Vite.
-- [ ] Build Express routes, validation, rate limiting, and centralized errors.
-- [ ] Add MongoDB models for users, saved profiles, and dated snapshots.
-- [ ] Add authentication and owner-scoped saved dashboards.
-- [ ] Add caching, retries, upstream timeouts, and observability.
+### Platform
+- [ ] Express.js API service and explicit API versioning.
+- [ ] Email verification and account deletion workflow.
+- [ ] Shared Redis caching and distributed rate limiting.
+- [ ] Automated integration tests and CI checks.
+- [ ] Observability, abuse monitoring, and operational alerts.
 
-### Analytics and AI
-- [ ] Track historical snapshots and visualize progress over time.
-- [ ] Add profile comparison and shareable report links.
-- [ ] Generate optional AI practice recommendations from verified metrics.
-- [ ] Explain weak difficulty areas and suggest a weekly practice plan.
-- [ ] Test normalization, API validation, and critical UI flows.
+### AI
+- [ ] Optional AI study coach grounded in retrieved profile data.
+- [ ] Topic recommendations and weekly practice plans.
+- [ ] Explanations that clearly distinguish official metrics from generated suggestions.
 
-## Product quality and security principles
+## Security and privacy
 
-- Never collect LeetCode passwords or session cookies.
-- Validate usernames and upstream JSON on the server.
-- Apply rate limits, request timeouts, and bounded caching.
-- Keep AI guidance clearly labeled as generated advice, not official metrics.
-- Never expose API keys or database credentials in browser code.
+- Never ask for a LeetCode password, session cookie, or access token.
+- Keep secrets on the server and out of frontend code.
+- Validate request payloads before writing to MongoDB or calling upstream services.
+- Do not expose password hashes or reset tokens through API responses.
+- Use shared rate limiting and abuse monitoring before scaling public registration.
+- Review [Privacy Policy](./privacy.html) and [Terms of Use](./terms.html).
 
 ## Contributing
 
-Issues and pull requests are welcome. Keep changes focused, use descriptive commit messages, and include reproduction steps or screenshots for UI changes.
+Focused pull requests are welcome. Include the reason for the change, reproduction steps, screenshots for UI changes, and any relevant test output.
 
 ## License
 
-Distributed under the MIT License. See [LICENSE](./LICENSE).
+MIT. See [LICENSE](./LICENSE).
 
 ## Disclaimer
 
