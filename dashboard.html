@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#090d18"><meta name="description" content="Your personal LeetMetric workspace and saved LeetCode profile.">
+  <meta name="theme-color" content="#090d18"><meta name="robots" content="noindex,nofollow"><meta name="description" content="Your personal LeetMetric workspace and saved LeetCode profile.">
   <title>Your dashboard | LeetMetric</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -17,7 +17,16 @@
   </section>
   <section class="dashboard-panels">
     <article class="dashboard-panel"><h3>Quick profile lookup</h3><p>Fetch a fresh summary of your public LeetCode profile.</p><form id="lookup" class="profile-search"><input id="user-input" name="username" maxlength="30" placeholder="LeetCode username"><button id="search-btn" type="submit">View stats</button></form><div id="status" class="form-status" role="status"></div><div id="profile-caption" class="dashboard-note"></div></article>
-    <article class="dashboard-panel"><h3>Problems solved</h3><p id="total-solved" style="font-size:28px;color:var(--page-accent);font-weight:800">—</p><div class="dashboard-note">Easy <strong id="easy-label">—</strong></div><div class="dashboard-note">Medium <strong id="medium-label">—</strong></div><div class="dashboard-note">Hard <strong id="hard-label">—</strong></div></article>
+    <article class="dashboard-panel"><h3>Problems solved</h3><p id="total-solved" style="font-size:28px;color:var(--page-accent);font-weight:800">—</p>
+      <div class="dashboard-note">Accepted submissions <strong id="accepted-count">—</strong></div>
+      <div class="dashboard-note">All submissions <strong id="submission-count">—</strong></div>
+      <div class="dashboard-note">Acceptance rate <strong id="acceptance-rate">—</strong></div>
+      <div class="dashboard-note">Easy <strong id="easy-label">—</strong><i id="easy-bar" class="bar easy-bar" style="width:0%"></i></div>
+      <div class="dashboard-note">Medium <strong id="medium-label">—</strong><i id="medium-bar" class="bar medium-bar" style="width:0%"></i></div>
+      <div class="dashboard-note">Hard <strong id="hard-label">—</strong><i id="hard-bar" class="bar hard-bar" style="width:0%"></i></div>
+      <div id="submission-breakdown" class="submission-breakdown"></div>
+      <a id="leetcode-link" class="text-link" href="https://leetcode.com/" target="_blank" rel="noreferrer">Open LeetCode ↗</a>
+      <button id="copy-link" type="button" class="text-link" disabled>Copy profile link</button></article>
   </section>
   <div class="dashboard-note" style="margin-top:16px">Historical charts, profile comparisons, and AI practice recommendations are planned features; they are not live in this release.</div>
 </main>
