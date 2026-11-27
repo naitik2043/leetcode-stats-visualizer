@@ -243,8 +243,8 @@ LeetMetric is an independent community project and is not affiliated with, endor
 
 ## Paste Vault integration
 
-The signed-in dashboard contains a Code Vault entry that opens the separate Paste Vault application. LeetMetric validates the current session and creates a 90-second, single-use launch ticket. Paste Vault verifies that ticket, consumes it from the shared MongoDB database and issues its own HttpOnly session cookie. The ticket is delivered in the URL fragment, not as a query parameter, and cannot be reused.
+The signed-in dashboard contains a Code Vault entry that opens the separate Paste Vault application. LeetMetric validates the current session and creates a random 256-bit, 90-second one-time ticket. Only its SHA-256 hash is stored in MongoDB. Paste Vault atomically consumes the hash, checks the user's token version and issues its own HttpOnly session cookie. The ticket is delivered in the URL fragment, not as a query parameter, and cannot be reused.
 
-Both applications must be configured with the same MONGODB_URI and JWT_SECRET. LeetMetric additionally needs PASTE_APP_URL set to the deployed Paste Vault origin. Paste Vault is private by default; individual snippets may be made unlisted by the user. Anyone who receives an unlisted link can view its content.
+Both applications must use the same MONGODB_URI, but each keeps an independent JWT_SECRET for its own sessions. LeetMetric additionally needs PASTE_APP_URL set to the Paste Vault origin. Paste Vault is private by default; individual snippets may be made unlisted by the user. Anyone who receives an unlisted link can view its content.
 
 LeetMetric account deletion also removes the user's Code Vault snippets and outstanding launch tickets in the same database transaction.
