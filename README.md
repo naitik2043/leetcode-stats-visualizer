@@ -63,7 +63,7 @@ git clone https://github.com/naitik2043/leetcode-stats-visualizer.git
 cd leetcode-stats-visualizer
 ```
 
-Open `index.html` with VS Code Live Server or another static server. The dashboard lookup requires an API implementation at `/api/leetcode/:username`; without it, the UI intentionally shows an error state. Do not add a browser-side public CORS proxy.
+Open `index.html` with VS Code Live Server or another static server. A Vercel serverless route is included at `/api/leetcode/[username]`. It validates usernames, queries LeetCode from the server, normalizes the response, and uses short-lived in-memory caching. The browser never calls a public CORS proxy. The cache is instance-local and should be replaced with shared Redis or another durable cache when scaling.
 
 ## Future API environment
 
