@@ -1,6 +1,6 @@
 # Vercel API routes
 
-The `api/` directory contains serverless Node.js handlers deployed by Vercel.
+The `api/` directory contains serverless Node.js handlers deployed by Vercel. To stay within the Vercel Hobby plan's 12-function deployment limit, all authenticated workspace routes are rewritten to one catch-all function at `api/workspace/[...path].js`; route logic lives in `server/workspace/index.js`.
 
 ## Routes
 
@@ -13,7 +13,7 @@ The `api/` directory contains serverless Node.js handlers deployed by Vercel.
 - `POST /api/auth/reset-password` — consume a single-use reset token.
 - `GET /api/user/profile` and `POST /api/user/profile` — read or update a saved username.
 - `DELETE /api/user/account` — permanently delete the signed-in account and its owned snapshots, goals and revision items after email/password confirmation.
-- `GET /api/analytics/snapshots` — read the signed-in user's saved daily profile snapshots.
+- `GET /api/analytics/snapshots` — read the signed-in user's saved daily profile snapshots (rewritten internally to the shared workspace handler).
 - `POST /api/analytics/snapshots` — upsert today's snapshot for the account's saved profile.
 - `GET /api/goals` — list private goals and calculate progress from the latest saved snapshot.
 - `POST /api/goals` — create a 7-day or 30-day goal from a saved snapshot baseline.
