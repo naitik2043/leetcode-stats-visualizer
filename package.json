@@ -1,10 +1,18 @@
 {
   "name": "leetmetric",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "private": true,
-  "description": "LeetCode profile analytics dashboard",
+  "description": "LeetCode analytics dashboard and developer progress workspace",
   "scripts": {
     "dev": "vercel dev",
-    "lint:syntax": "node --check script.js && node --check api/leetcode/[username].js"
-  }
+    "check": "npm run check:frontend && npm run check:api",
+    "check:frontend": "node --check script.js && node --check site.js && node --check dashboard.js",
+    "check:api": "node --check server/auth.js && node --check server/db.js && node --check api/auth/signup.js && node --check api/auth/login.js && node --check api/auth/logout.js && node --check api/auth/me.js && node --check api/auth/forgot-password.js && node --check api/auth/reset-password.js && node --check api/user/profile.js && node --check api/contact.js && node --check api/leetcode/[username].js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.18.0"
+  },
+  "devDependencies": {}
 }
