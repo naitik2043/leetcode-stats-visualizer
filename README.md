@@ -2,7 +2,7 @@
 
 A polished LeetCode profile dashboard that turns public problem-solving activity into a readable performance snapshot. The project is evolving from a static HTML/CSS/JavaScript prototype into a full-stack MERN application with a secure API layer, persistence, and optional AI-powered practice insights.
 
-> **Implementation status:** This milestone delivers the redesigned responsive frontend and its API contract. The live API integration, MongoDB persistence, authentication, historical tracking, and AI coaching are planned follow-up work and are not represented as completed features.
+> **Implementation status:** This milestone delivers the redesigned responsive frontend and a working Vercel serverless LeetCode lookup endpoint. MongoDB persistence, authentication, historical tracking, React migration, and AI coaching are planned follow-up work and are not represented as completed features.
 
 ## Product direction
 
@@ -17,10 +17,10 @@ A polished LeetCode profile dashboard that turns public problem-solving activity
 | Layer | Current foundation | Planned evolution |
 |---|---|---|
 | UI | HTML, CSS, JavaScript | React + Vite |
-| API | `/api/leetcode/:username` contract | Node.js + Express |
+| API | Vercel serverless route | Express API (optional migration) |
 | Database | Not wired yet | MongoDB + Mongoose |
 | AI | Not wired yet | Optional LLM-backed coaching endpoint |
-| Hosting | Vercel-compatible static frontend | Vercel frontend + hosted API/database |
+| Hosting | Vercel frontend + serverless API | MERN app with hosted API/database |
 
 ## Architecture direction
 
@@ -37,7 +37,7 @@ Node.js + Express API
        +------ AI insights service (optional)
 ```
 
-The frontend calls `GET /api/leetcode/:username`. The API is expected to return normalized statistics:
+The frontend calls `GET /api/leetcode/:username`. The Vercel serverless function validates the username, queries LeetCode server-side, normalizes the payload, applies a 10-second upstream timeout, and caches data in memory briefly per function instance. The API returns normalized statistics:
 
 ```json
 {
@@ -83,7 +83,8 @@ AI_MODEL=
 - [x] Replace the basic centered card with a responsive product dashboard.
 - [x] Improve header, navigation, footer, metadata, and mobile layouts.
 - [x] Remove the fragile public CORS proxy from browser code.
-- [x] Define a normalized API contract and clear request states.
+- [x] Define a normalized API response and clear request states.
+- [x] Add a serverless profile lookup endpoint with validation, timeout, and short-lived in-memory caching.
 
 ### MERN platform
 - [ ] Migrate the UI to React + Vite.
