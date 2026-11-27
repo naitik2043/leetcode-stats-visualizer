@@ -161,13 +161,13 @@ Configure a Resend account, verify the sending domain/address, then add `RESEND_
 
 ## Quality checks
 
-Run JavaScript syntax checks for the frontend, server helpers, and API handlers:
+Run JavaScript syntax checks and the dependency-free LeetCode normalization unit tests with:
 
 ```bash
 npm run check
 ```
 
-The project should also be tested with a configured MongoDB database and a non-production email sender before enabling public account registration. Test successful signup/login/logout, duplicate email handling, invalid credentials, expired sessions, saved profile validation, reset token expiry/reuse, and contact form validation.
+GitHub Actions runs the same quality command on pushes to feature branches and on pull requests targeting main. The project should also be tested with a configured MongoDB database and a non-production email sender before enabling public account registration. Test successful signup/login/logout, duplicate email handling, invalid credentials, expired sessions, saved profile validation, reset token expiry/reuse, and contact form validation.
 
 ## Roadmap
 
