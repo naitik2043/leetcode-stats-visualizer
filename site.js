@@ -4,6 +4,48 @@
   const footerHost = document.getElementById("site-footer");
   const current = window.location.pathname.toLowerCase();
   const active = (path) => current === path ? ' aria-current="page"' : "";
+
+  // Keep the selected color scheme across pages and respect the OS preference until the user chooses.
+  const themeRoot = document.documentElement;
+  const themeMedia = window.matchMedia ? window.matchMedia("(prefers-color-scheme: light)") : null;
+  let storedTheme = null;
+  try {
+    const saved = window.localStorage.getItem("leetmetric-theme");
+    storedTheme = saved === "light" || saved === "dark" ? saved : null;
+  } catch { /* Storage can be unavailable in restricted browsing modes. */ }
+
+  const sunIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"></path></svg>';
+  const moonIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.2 15.4A8.5 8.5 0 0 1 8.6 3.8 8.7 8.7 0 1 0 20.2 15.4Z"></path></svg>';
+
+  const applyTheme = (theme, persist = false) => {
+    const next = theme === "light" ? "light" : "dark";
+    themeRoot.dataset.theme = next;
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    if (themeColor) themeColor.setAttribute("content", next === "light" ? "#f5f7f2" : "#090d18");
+    const toggle = document.querySelector("[data-theme-toggle]");
+    if (toggle) {
+      const target = next === "dark" ? "light" : "dark";
+      toggle.innerHTML = next === "dark" ? sunIcon : moonIcon;
+      toggle.setAttribute("aria-label", `Switch to ${target} mode`);
+      toggle.setAttribute("title", `Switch to ${target} mode`);
+      toggle.setAttribute("aria-pressed", String(next === "light"));
+    }
+    if (persist) {
+      try { window.localStorage.setItem("leetmetric-theme", next); storedTheme = next; } catch { /* Theme still applies for this page. */ }
+    }
+  };
+
+  applyTheme(themeRoot.dataset.theme || "dark");
+  if (!storedTheme && themeMedia) {
+    themeMedia.addEventListener("change", (event) => applyTheme(event.matches ? "light" : "dark"));
+  }
+  window.addEventListener("storage", (event) => {
+    if (event.key === "leetmetric-theme" && (event.newValue === "light" || event.newValue === "dark")) {
+      storedTheme = event.newValue;
+      applyTheme(event.newValue);
+    }
+  });
+
   if (headerHost) {
     headerHost.innerHTML = `
       <header class="site-header">
@@ -13,9 +55,16 @@
           <a href="/about.html" ${active("/about.html")}>About</a><a href="/faq.html" ${active("/faq.html")}>FAQ</a>
           <a href="/contact.html" ${active("/contact.html")}>Contact</a>
         </nav>
-        <div class="header-actions" id="header-actions"><a class="header-login" href="/login.html">Log in</a><a class="header-signup" href="/signup.html">Create account</a></div>
+        <div class="header-right"><button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch to light mode" title="Switch to light mode" aria-pressed="false">${sunIcon}</button><div class="header-actions" id="header-actions"><a class="header-login" href="/login.html">Log in</a><a class="header-signup" href="/signup.html">Create account</a></div></div>
         <button class="mobile-menu-button" type="button" aria-label="Toggle navigation" aria-expanded="false">Menu</button>
       </header>`;
+    const themeButton = headerHost.querySelector("[data-theme-toggle]");
+    if (themeButton) {
+      applyTheme(themeRoot.dataset.theme || "dark");
+      themeButton.addEventListener("click", () => {
+        applyTheme(themeRoot.dataset.theme === "dark" ? "light" : "dark", true);
+      });
+    }
     const button = headerHost.querySelector(".mobile-menu-button");
     button.addEventListener("click", () => {
       const header = headerHost.querySelector(".site-header");
