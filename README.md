@@ -51,6 +51,10 @@ LeetMetric is an independent LeetCode statistics dashboard with a growing accoun
 
 Account and contact features return a clear service-unavailable response until the MongoDB and JWT environment variables are configured. Password recovery additionally requires a verified sender and Resend API key.
 
+## Deployment function budget
+
+Vercel Hobby deployments allow at most 12 Serverless Functions. The project keeps the six authentication routes, public LeetCode lookup, and contact endpoint separate, while `vercel.json` rewrites profile, account, snapshot, goal, and revision endpoints through a single `/api/workspace/*` catch-all function. This keeps the deployed function count below the plan limit without removing the existing public API URLs.
+
 ## Architecture
 
 ```text
@@ -71,11 +75,10 @@ Browser
         +-- /api/user/profile
         |      +-- Saved LeetCode username
         |
-        +-- /api/analytics/snapshots
-        |      +-- Mongoose ProfileSnapshot model
-        |
-        +-- /api/goals and /api/goals/:id
-        |      +-- Mongoose Goal model
+        +-- /api/workspace/* (shared catch-all function)
+               +-- profile and account management
+               +-- daily snapshots and goals
+               +-- private revision queue
         |
         +-- /api/contact
                +-- Mongoose ContactMessage model
