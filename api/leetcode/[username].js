@@ -74,7 +74,8 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed." });
   }
 
-  const username = String(req.query.username || "").trim();
+  const routeUsername = Array.isArray(req.query.username) ? req.query.username[0] : req.query.username;
+  const username = String(routeUsername || "").trim();
   if (!USERNAME_PATTERN.test(username)) return res.status(400).json({ error: "Invalid LeetCode username." });
 
   const cached = cache.get(username.toLowerCase());
