@@ -30,6 +30,7 @@ LeetMetric is an independent LeetCode statistics dashboard with a growing accoun
 - Solved-problem counts by Easy, Medium, and Hard difficulty.
 - Accepted submissions, total submissions, and acceptance-rate overview.
 - Responsive product navigation, account pages, and consistent footer.
+- Accessible light/dark theme switcher with a saved preference and system-theme fallback.
 - MongoDB-backed registration, login, logout, current-session, and saved-profile endpoints.
 - Password hashing with bcryptjs and signed HttpOnly session cookies.
 - Password-reset token flow with expiry and single-use semantics.
