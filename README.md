@@ -45,7 +45,8 @@ LeetMetric is an independent LeetCode statistics dashboard with a growing accoun
 - Password hashing with bcryptjs and signed HttpOnly session cookies.
 - Password-reset token flow with expiry and single-use semantics.
 - Validated contact-message persistence.
-- Account deletion requiring current-password and email confirmation, with transactional cleanup of account-owned analytics and practice data.
+- Account deletion requiring current-password and email confirmation, with transactional cleanup of account-owned analytics, practice data and Paste Vault records.
+- One-time authenticated handoff to Paste Vault, a separate private code workspace for LeetCode solutions, reusable patterns and version history.
 - Server-side LeetCode GraphQL request with username validation, upstream timeout, and short-lived cache.
 - SEO sitemap, robots rules, favicon, and baseline security response headers.
 
@@ -145,6 +146,7 @@ The Vercel local development server will print the local URL (typically `http://
 | `RESEND_API_KEY` | For password reset | Resend API key |
 | `EMAIL_FROM` | For password reset | Verified sender address in Resend |
 | `APP_URL` | Recommended | Canonical public application URL |
+| `PASTE_APP_URL` | For Code Vault | Paste Vault origin, e.g. `https://paste-app-wine.vercel.app` |
 
 Generate a strong session secret locally:
 
@@ -183,6 +185,7 @@ Configure a Resend account, verify the sending domain/address, then add `RESEND_
 | GET / POST | `/api/revisions` | List or add private DSA revision items |
 | PATCH / DELETE | `/api/revisions/:id` | Update or delete an owned revision item |
 | DELETE | `/api/goals/:id` | Delete an owned practice goal |
+| POST | `/api/integrations/paste` | Create a short-lived one-time Paste Vault launch URL |
 | POST | `/api/contact` | Store a validated contact request |
 
 ## Quality checks
@@ -236,3 +239,12 @@ MIT. See [LICENSE](./LICENSE).
 ## Disclaimer
 
 LeetMetric is an independent community project and is not affiliated with, endorsed by, or sponsored by LeetCode. LeetCode is a trademark of its respective owner.
+
+
+## Paste Vault integration
+
+The signed-in dashboard contains a Code Vault entry that opens the separate Paste Vault application. LeetMetric validates the current session and creates a 90-second, single-use launch ticket. Paste Vault verifies that ticket, consumes it from the shared MongoDB database and issues its own HttpOnly session cookie. The ticket is delivered in the URL fragment, not as a query parameter, and cannot be reused.
+
+Both applications must be configured with the same MONGODB_URI and JWT_SECRET. LeetMetric additionally needs PASTE_APP_URL set to the deployed Paste Vault origin. Paste Vault is private by default; individual snippets may be made unlisted by the user. Anyone who receives an unlisted link can view its content.
+
+LeetMetric account deletion also removes the user's Code Vault snippets and outstanding launch tickets in the same database transaction.
