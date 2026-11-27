@@ -3,9 +3,11 @@ const $ = (selector) => document.querySelector(selector);
 const form = $("#lookup"), input = $("#user-input"), searchButton = $("#search-btn");
 const statusBox = $("#status"), copyButton = $("#copy-link");
 let activeUsername = "";
-$("#year").textContent = new Date().getFullYear();
+const yearElement = $("#year");
+if (yearElement) yearElement.textContent = new Date().getFullYear();
 
 function setStatus(message, kind = "") {
+  if (!statusBox) return;
   statusBox.textContent = message;
   statusBox.className = `status-message ${kind}`.trim();
 }
@@ -17,7 +19,8 @@ function formatNumber(value) { return (Number(value) || 0).toLocaleString(); }
 function setProgress(labelId, barId, solved, total) {
   const safeTotal = Number(total) || 0, safeSolved = Number(solved) || 0;
   setMetric(labelId, `${formatNumber(safeSolved)} / ${formatNumber(safeTotal)}`);
-  document.getElementById(barId).style.width = `${safeTotal > 0 ? Math.min(100, safeSolved / safeTotal * 100) : 0}%`;
+  const bar = document.getElementById(barId);
+  if (bar) bar.style.width = `${safeTotal > 0 ? Math.min(100, safeSolved / safeTotal * 100) : 0}%`;
 }
 function renderStats(data, username) {
   const stats = data.stats || data, solved = stats.solved || {}, totals = stats.totalQuestions || {};
@@ -64,7 +67,8 @@ form.addEventListener("submit", async (event) => {
     const data = await fetchStats(username);
     renderStats(data, username);
     setStatus("Profile statistics loaded successfully.", "success");
-    $("#insights").scrollIntoView({behavior:"smooth", block:"start"});
+    const insights = $("#insights");
+    if (insights) insights.scrollIntoView({behavior:"smooth", block:"start"});
   } catch (error) {
     setStatus(error.message || "Something went wrong. Please try again later.", "error");
   } finally {
