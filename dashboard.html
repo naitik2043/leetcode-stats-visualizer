@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d18"><meta name="description" content="Your personal LeetMetric workspace and saved LeetCode profile.">
+  <title>Your dashboard | LeetMetric</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/site.css">
+</head>
+<body><div id="site-header"></div>
+<main class="page-main">
+  <section class="page-hero compact"><div class="page-kicker">PERSONAL WORKSPACE</div><div class="dashboard-welcome"><div><div class="page-kicker">SIGNED-IN DASHBOARD</div><h2 id="welcome-name">Welcome to your workspace.</h2><p id="welcome-email">Loading account details…</p></div><a class="header-dashboard" href="/#insights">Public stats lookup ↗</a></div></section>
+  <section class="dashboard-panels">
+    <article class="dashboard-panel"><h3>Your LeetCode profile</h3><p>Save the username you want to open first. This does not connect your LeetCode account or require its password.</p><form id="save-profile-form"><div class="profile-search"><input id="saved-username" name="leetcodeUsername" maxlength="30" placeholder="LeetCode username"><button type="submit">Save profile</button></div></form><div class="form-status" id="profile-status" aria-live="polite"></div><div class="dashboard-note">Only public profile statistics are fetched when you choose to look them up.</div></article>
+    <article class="dashboard-panel"><h3>Account settings</h3><p>Your account uses a separate LeetMetric password. You can update it through password recovery.</p><a class="text-link" href="/forgot-password.html">Reset password →</a><p><a class="text-link" href="/privacy.html">Review privacy policy →</a></p></article>
+  </section>
+  <section class="dashboard-panels">
+    <article class="dashboard-panel"><h3>Quick profile lookup</h3><p>Fetch a fresh summary of your public LeetCode profile.</p><form id="lookup" class="profile-search"><input id="user-input" name="username" maxlength="30" placeholder="LeetCode username"><button id="search-btn" type="submit">View stats</button></form><div id="status" class="form-status" role="status"></div><div id="profile-caption" class="dashboard-note"></div></article>
+    <article class="dashboard-panel"><h3>Problems solved</h3><p id="total-solved" style="font-size:28px;color:var(--page-accent);font-weight:800">—</p><div class="dashboard-note">Easy <strong id="easy-label">—</strong></div><div class="dashboard-note">Medium <strong id="medium-label">—</strong></div><div class="dashboard-note">Hard <strong id="hard-label">—</strong></div></article>
+  </section>
+  <div class="dashboard-note" style="margin-top:16px">Historical charts, profile comparisons, and AI practice recommendations are planned features; they are not live in this release.</div>
+</main>
+<script src="/script.js" defer></script><script src="/dashboard.js" defer></script><div id="site-footer"></div>
+<script src="/site.js" defer></script></body></html>
