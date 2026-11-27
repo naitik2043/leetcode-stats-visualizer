@@ -6,6 +6,8 @@ const User = require("../models/User");
 const ProfileSnapshot = require("../models/ProfileSnapshot");
 const Goal = require("../models/Goal");
 const RevisionItem = require("../models/RevisionItem");
+const CodePaste = require("../models/CodePaste");
+const IntegrationTicket = require("../models/IntegrationTicket");
 const {
   json,
   getSessionUser,
@@ -110,6 +112,8 @@ async function handleAccountDeletion(req, res) {
         await ProfileSnapshot.deleteMany({ userId: user._id }, { session });
         await Goal.deleteMany({ userId: user._id }, { session });
         await RevisionItem.deleteMany({ userId: user._id }, { session });
+        await CodePaste.deleteMany({ userId: user._id }, { session });
+        await IntegrationTicket.deleteMany({ userId: user._id }, { session });
         await User.deleteOne({ _id: user._id }, { session });
       });
     } finally {
