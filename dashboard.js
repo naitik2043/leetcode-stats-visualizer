@@ -22,8 +22,18 @@
       welcomeName.textContent = `Welcome, ${payload.user.name}.`;
       welcomeEmail.textContent = payload.user.email;
       savedInput.value = payload.user.leetcodeUsername || "";
-      if (payload.user.leetcodeUsername) {
-        document.getElementById("user-input").value = payload.user.leetcodeUsername;
+      const savedUsername = payload.user.leetcodeUsername || "";
+      if (savedUsername) {
+        document.getElementById("user-input").value = savedUsername;
+        document.dispatchEvent(new CustomEvent("leetmetric:workspace-ready", {
+          detail: { username: savedUsername, email: payload.user.email }
+        }));
+        const lookupForm = document.getElementById("lookup");
+        if (lookupForm) lookupForm.requestSubmit();
+      } else {
+        document.dispatchEvent(new CustomEvent("leetmetric:workspace-ready", {
+          detail: { username: "", email: payload.user.email }
+        }));
       }
     } catch (error) {
       welcomeName.textContent = "Your workspace is not ready yet.";
@@ -53,6 +63,10 @@
       if (!response.ok) throw new Error(payload.error || "Unable to save your profile.");
       savedInput.value = payload.user.leetcodeUsername || "";
       document.getElementById("user-input").value = savedInput.value;
+      document.dispatchEvent(new CustomEvent("leetmetric:workspace-ready", {
+        detail: { username: savedInput.value, email: payload.user.email }
+      }));
+      if (savedInput.value) document.getElementById("lookup").requestSubmit();
       showProfileStatus(savedInput.value ? "Your preferred LeetCode profile is saved." : "Saved profile removed.", "success");
     } catch (error) {
       showProfileStatus(error.message || "Unable to save your profile.", "error");

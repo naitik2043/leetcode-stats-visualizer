@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d18">
+  <meta name="description" content="Compare public LeetCode profiles with LeetMetric. Review problem-solving totals, difficulty distribution and submissions side by side.">
+  <script src="/theme-init.js"></script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Compare LeetCode Profiles | LeetMetric</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/site.css">
+  <link rel="stylesheet" href="/compare.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <main class="compare-main">
+    <section class="compare-hero">
+      <p class="page-kicker">SIDE-BY-SIDE ANALYTICS</p>
+      <h1>Compare progress.<br><span>Not people.</span></h1>
+      <p>Compare two public LeetCode profiles using the same statistics and definitions. A comparison is a snapshot, not a judgement of overall engineering ability.</p>
+    </section>
+
+    <section class="compare-search-card">
+      <form id="compare-form" class="compare-form" novalidate>
+        <div class="compare-input-group">
+          <label for="compare-user-a">FIRST PROFILE</label>
+          <div class="compare-input"><span aria-hidden="true">@</span><input id="compare-user-a" maxlength="30" placeholder="First LeetCode username" required></div>
+        </div>
+        <div class="compare-versus" aria-hidden="true">VS</div>
+        <div class="compare-input-group">
+          <label for="compare-user-b">SECOND PROFILE</label>
+          <div class="compare-input"><span aria-hidden="true">@</span><input id="compare-user-b" maxlength="30" placeholder="Second LeetCode username" required></div>
+        </div>
+        <button type="submit" id="compare-submit">Compare profiles <span aria-hidden="true">→</span></button>
+      </form>
+      <div id="compare-status" class="status-message" role="status" aria-live="polite">Enter two public usernames to compare their latest available profile metrics.</div>
+    </section>
+
+    <section id="comparison-results" class="comparison-results" hidden>
+      <div class="comparison-heading">
+        <div><p class="page-kicker">PROFILE COMPARISON</p><h2>At a glance</h2></div>
+        <p id="comparison-time"></p>
+      </div>
+      <div class="comparison-profiles">
+        <article class="comparison-profile-card">
+          <span class="profile-label">PROFILE A</span>
+          <h3 id="profile-a-name">—</h3>
+          <strong id="profile-a-solved">—</strong>
+          <span>problems solved</span>
+        </article>
+        <article class="comparison-profile-card">
+          <span class="profile-label">PROFILE B</span>
+          <h3 id="profile-b-name">—</h3>
+          <strong id="profile-b-solved">—</strong>
+          <span>problems solved</span>
+        </article>
+      </div>
+      <article class="comparison-table-card">
+        <h3>Metric breakdown</h3>
+        <div class="comparison-table-wrap">
+          <table class="comparison-table">
+            <thead><tr><th>Metric</th><th id="table-name-a">Profile A</th><th id="table-name-b">Profile B</th><th>Difference</th></tr></thead>
+            <tbody id="comparison-rows"></tbody>
+          </table>
+        </div>
+      </article>
+      <p class="comparison-disclaimer">Data comes from public LeetCode profile statistics. Topic counts are not a measure of mastery. Daily submission calendars and private submission details are not part of this comparison.</p>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="/compare.js" defer></script>
+  <script src="/site.js" defer></script>
+</body>
+</html>
