@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d18"><meta name="description" content="Answers about LeetMetric accounts, LeetCode statistics, privacy, and product features.">
+  <title>Frequently asked questions | LeetMetric</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/site.css">
+</head>
+<body><div id="site-header"></div>
+<main class="page-main">
+  <section class="page-hero"><div class="page-kicker">HELP CENTRE</div><h1 class="page-title">Questions, <span style="color:var(--page-accent)">answered.</span></h1><p class="page-lead">A few practical details about using LeetMetric and what the product currently supports.</p></section>
+  <div class="faq-list">
+    <details open><summary>What is LeetMetric?</summary><p>LeetMetric is an independent dashboard for visualizing public LeetCode statistics and understanding problem-solving activity.</p></details>
+    <details><summary>Do I need to share my LeetCode password?</summary><p>No. Public profile lookup only needs a public LeetCode username. Never share your LeetCode password, session cookie, or authentication token with this app.</p></details>
+    <details><summary>Why create an account?</summary><p>An account is intended for saving your preferred username and accessing a personal dashboard. Account creation requires the site's MongoDB environment to be configured.</p></details>
+    <details><summary>Are the statistics official?</summary><p>Statistics are requested from LeetCode's public GraphQL endpoint. Availability and field definitions can change, so LeetMetric cannot guarantee uninterrupted upstream access.</p></details>
+    <details><summary>Does LeetMetric already have AI coaching?</summary><p>AI coaching is on the roadmap. It is not part of the current production release and should not be treated as an available feature yet.</p></details>
+    <details><summary>Can I compare profiles?</summary><p>Profile comparison is planned. The current release focuses on an individual public profile overview.</p></details>
+    <details><summary>What happens to my account data?</summary><p>Account data is intended to be stored in MongoDB. Review the Privacy Policy for the planned data categories, security controls, and retention approach.</p></details>
+    <details><summary>What if I cannot sign up or reset my password?</summary><p>Account actions require MongoDB and JWT secrets. Password-reset emails additionally require a configured email provider. If setup is incomplete, the app returns a clear configuration message rather than pretending the action succeeded.</p></details>
+    <details><summary>Is LeetMetric affiliated with LeetCode?</summary><p>No. LeetMetric is an independent community project and is not affiliated with, endorsed by, or sponsored by LeetCode.</p></details>
+  </div>
+  <section class="page-hero compact"><h2 class="page-title" style="font-size:30px">Still need help?</h2><p class="page-lead">Send a message through the contact page and include the page or action you were using.</p><a class="header-signup" href="/contact.html" style="display:inline-block;margin-top:12px">Contact the project ↗</a></section>
+</main><div id="site-footer"></div>
+<script src="/site.js" defer></script></body></html>
