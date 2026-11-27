@@ -263,3 +263,26 @@ body { background: var(--bg); color: var(--text); transition: background-color .
 @media (prefers-reduced-motion: reduce) {
   body, .theme-toggle { transition: none; }
 }
+
+
+/* Keep filled controls high-contrast in the light palette while retaining a deeper green for accent text. */
+:root[data-theme="light"] .primary-button,
+:root[data-theme="light"] .header-signup,
+:root[data-theme="light"] .profile-search button,
+:root[data-theme="light"] .search-control button {
+  background: #d9edb8;
+  color: #263919;
+  border: 1px solid #b7d78b;
+}
+:root[data-theme="light"] .primary-button:hover,
+:root[data-theme="light"] .header-signup:hover,
+:root[data-theme="light"] .profile-search button:hover,
+:root[data-theme="light"] .search-control button:hover {
+  background: #cde6a5;
+}
+:root[data-theme="light"] .brand-mark {
+  background: #d9edb8;
+  color: #263919;
+}
+:root[data-theme="light"] .brand-mark span { color: #557b27; }
+:root[data-theme="light"] .target-ring { border-color: var(--page-accent); }
