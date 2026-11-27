@@ -1,11 +1,9 @@
 const crypto = require("node:crypto");
-const jwt = require("jsonwebtoken");
 const connectToDatabase = require("../../server/db");
 const {
   json,
   getSessionUser,
   enforceSameOrigin,
-  requireSecret,
   rateLimit,
   methodNotAllowed
 } = require("../../server/auth");
@@ -39,24 +37,21 @@ module.exports = async function handler(req, res) {
     const user = await getSessionUser(req);
     if (!user) return json(res, 401, { error: "Sign in to LeetMetric before opening Code Vault." });
 
-    const signingSecret = requireSecret();
-    const ticketId = crypto.randomUUID();
+    // Use an opaque 256-bit one-time ticket. Store only its SHA-256 hash;
+    // the ticket itself is delivered in the URL fragment and never logged by HTTP.
+    const opaqueTicket = crypto.randomBytes(32).toString("base64url");
+    const ticketId = crypto.createHash("sha256").update(opaqueTicket).digest("hex");
     const expiresAt = new Date(Date.now() + 90 * 1000);
-    const token = jwt.sign({
-      sub: String(user._id),
-      ver: Number(user.tokenVersion || 0),
-      jti: ticketId,
-      purpose: "paste-app-sso"
-    }, signingSecret, {
-      expiresIn: "90s",
-      issuer: "leetmetric",
-      audience: "paste-app"
+
+    await IntegrationTicket.create({
+      ticketId,
+      userId: user._id,
+      tokenVersion: Number(user.tokenVersion || 0),
+      expiresAt
     });
 
-    await IntegrationTicket.create({ ticketId, userId: user._id, expiresAt });
-
     return json(res, 200, {
-      launchUrl: appOrigin + "/#sso=" + encodeURIComponent(token),
+      launchUrl: appOrigin + "/#sso=" + encodeURIComponent(opaqueTicket),
       expiresInSeconds: 90
     });
   } catch (error) {
