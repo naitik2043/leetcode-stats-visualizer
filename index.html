@@ -1,49 +1,71 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LeetMetric</title>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d18">
+  <meta name="description" content="LeetMetric turns your LeetCode profile into a clear, actionable coding-performance dashboard.">
+  <title>LeetMetric — Your coding, in focus</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>LeetMetric</h1>
-
-    <div class="user-container">
-      <p>Enter your LeetCode username:</p>
-      <div class="user-input-container">
-        <input type="text" placeholder="username here" id="user-input">
-        <button id="search-btn">Search</button>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="LeetMetric home"><span class="brand-mark">L<span>.</span></span><span>leet<span class="brand-light">metric</span></span></a>
+    <nav class="desktop-nav" aria-label="Main navigation"><a href="#overview">Overview</a><a href="#insights">Insights</a><a href="#how-it-works">How it works</a></nav>
+    <a class="header-cta" href="#lookup">Explore dashboard <span>↗</span></a>
+  </header>
+  <main>
+    <section class="hero" id="overview">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse-dot"></span> A clearer view of your practice</div>
+        <h1>Make every<br><span>solve count.</span></h1>
+        <p class="hero-description">Your LeetCode journey, translated into meaningful progress. Track the numbers, understand your patterns, and decide what to improve next.</p>
+        <form class="search-form" id="lookup" novalidate>
+          <label for="user-input">LEETCODE USERNAME</label>
+          <div class="search-control"><span class="at-symbol">@</span><input id="user-input" name="username" type="text" placeholder="e.g. Naitik_Gupta" autocomplete="off" maxlength="30" required><button id="search-btn" type="submit">View stats <span>→</span></button></div>
+          <p class="form-hint">Public profile data · No password required</p>
+        </form>
+        <div class="hero-proof"><span class="proof-line"></span><span>Built for consistency, not comparison.</span></div>
       </div>
-    </div>
-
-    <div class="stats-container">
-      <div class="progress">
-        <div class="progress-item">
-          <div class="circle easy-progress">
-            <span id="easy-label">0/0</span>
-            <p>Easy</p>
-          </div>
+      <div class="hero-visual" aria-label="Illustrative coding progress dashboard">
+        <div class="visual-top"><span><i></i> LIVE PROFILE SNAPSHOT</span><span class="mono">01 / 03</span></div>
+        <div class="visual-main">
+          <div class="visual-user"><div class="avatar">LC</div><div><strong>Your next milestone</strong><small>Progress is a process.</small></div><span class="verified">● PUBLIC</span></div>
+          <div class="visual-total"><div><small>QUESTIONS SOLVED</small><strong>Keep building<span>.</span></strong></div><div class="target-ring">↗</div></div>
+          <div class="mini-bars"><div><span>Easy</span><i><b style="width:72%"></b></i><em>01</em></div><div><span>Medium</span><i><b style="width:48%"></b></i><em>02</em></div><div><span>Hard</span><i><b style="width:24%"></b></i><em>03</em></div></div>
+          <div class="visual-foot"><span>SMALL STEPS. STRONG HABITS.</span><span class="sparkline">⌁⌁⌁⌁⌁</span></div>
         </div>
-        <div class="progress-item">
-          <div class="circle medium-progress">
-            <span id="medium-label">0/0</span>
-            <p>Medium</p>
-          </div>
-        </div>
-        <div class="progress-item">
-          <div class="circle hard-progress">
-            <span id="hard-label">0/0</span>
-            <p>Hard</p>
-          </div>
-        </div>
+        <div class="floating-note"><span>✳</span><div><strong>Learn from your data</strong><small>Not just your streak.</small></div></div>
       </div>
-
-      <div class="stats-cards"></div>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
+    </section>
+    <section class="dashboard-section" id="insights" aria-live="polite">
+      <div class="section-heading"><div><div class="eyebrow">YOUR PERFORMANCE</div><h2>Stats that tell a story.</h2></div><p id="profile-caption">Enter a username to build your profile overview.</p></div>
+      <div id="status" class="status-message" role="status">Your dashboard is ready when you are.</div>
+      <div class="stats-shell">
+        <div class="metric-row">
+          <article class="metric-card featured"><span class="metric-label">TOTAL SOLVED</span><strong id="total-solved">—</strong><small>Across all difficulty levels</small></article>
+          <article class="metric-card"><span class="metric-label">ACCEPTED SUBMISSIONS</span><strong id="accepted-count">—</strong><small>Successful attempts</small></article>
+          <article class="metric-card"><span class="metric-label">TOTAL SUBMISSIONS</span><strong id="submission-count">—</strong><small>All recorded attempts</small></article>
+          <article class="metric-card"><span class="metric-label">ACCEPTANCE RATE</span><strong id="acceptance-rate">—</strong><small>Accepted / total attempts</small></article>
+        </div>
+        <div class="detail-grid">
+          <article class="panel"><div class="panel-heading"><div><span class="eyebrow">PROBLEM BREAKDOWN</span><h3>Difficulty distribution</h3></div><span class="panel-tag">SOLVED / TOTAL</span></div>
+            <div class="difficulty-list">
+              <div class="difficulty-item"><div class="difficulty-meta"><span><i class="difficulty-dot easy-dot"></i>Easy</span><strong id="easy-label">—</strong></div><div class="track"><span id="easy-bar" class="bar easy-bar"></span></div></div>
+              <div class="difficulty-item"><div class="difficulty-meta"><span><i class="difficulty-dot medium-dot"></i>Medium</span><strong id="medium-label">—</strong></div><div class="track"><span id="medium-bar" class="bar medium-bar"></span></div></div>
+              <div class="difficulty-item"><div class="difficulty-meta"><span><i class="difficulty-dot hard-dot"></i>Hard</span><strong id="hard-label">—</strong></div><div class="track"><span id="hard-bar" class="bar hard-bar"></span></div></div>
+            </div>
+          </article>
+          <article class="panel"><div class="panel-heading"><div><span class="eyebrow">ATTEMPT ACTIVITY</span><h3>Submission breakdown</h3></div><span class="panel-tag">ALL TIME</span></div><div id="submission-breakdown" class="submission-breakdown"><p>Search for a profile to see submission activity.</p></div></article>
+        </div>
+        <div class="dashboard-actions"><a id="leetcode-link" href="https://leetcode.com/" target="_blank" rel="noreferrer">Open LeetCode <span>↗</span></a><button id="copy-link" type="button" disabled>Copy profile link</button></div>
+      </div>
+    </section>
+    <section class="how-section" id="how-it-works"><div class="eyebrow">SIMPLE BY DESIGN</div><h2>Less noise.<br><span>More direction.</span></h2><div class="steps"><article><b>01</b><h3>Find your profile</h3><p>Enter a public LeetCode username. No account connection or credentials needed.</p></article><article><b>02</b><h3>Read your numbers</h3><p>See accepted problems, submission volume, and difficulty-level progress in one place.</p></article><article><b>03</b><h3>Choose your next step</h3><p>Use the breakdown to spot gaps and plan a more balanced practice routine.</p></article></div></section>
+  </main>
+  <footer class="site-footer"><a class="brand footer-brand" href="#"><span class="brand-mark">L<span>.</span></span><span>leet<span class="brand-light">metric</span></span></a><p>Built for the long game. Keep showing up.</p><div class="footer-links"><a href="https://leetcode.com/" target="_blank" rel="noreferrer">LeetCode ↗</a><a href="https://github.com/naitik2043/leetcode-stats-visualizer" target="_blank" rel="noreferrer">GitHub ↗</a></div><small>© <span id="year"></span> LeetMetric. Independent community project; not affiliated with LeetCode.</small></footer>
+  <script src="script.js" defer></script>
 </body>
 </html>

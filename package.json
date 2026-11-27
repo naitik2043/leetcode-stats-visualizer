@@ -1,0 +1,13 @@
+{
+  "name": "leetmetric",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LeetCode profile analytics dashboard",
+  "scripts": {
+    "dev": "vercel dev",
+    "lint:syntax": "node --check script.js && node --check api/leetcode/[username].js"
+  },
+  "devDependencies": {
+    "vercel": "^41.0.0"
+  }
+}
