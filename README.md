@@ -20,13 +20,23 @@ LeetMetric is an independent LeetCode statistics dashboard with a growing accoun
 | Sign up | `/signup.html` | Account registration |
 | Forgot password | `/forgot-password.html` | Request an email reset link |
 | Reset password | `/reset-password.html` | Single-use password reset |
-| Dashboard | `/dashboard.html` | Signed-in profile workspace |
+| Dashboard | `/dashboard.html` | Signed-in analytics, private history and goal workspace |
+| Compare | `/compare.html` | Side-by-side public profile comparison |
 | Privacy | `/privacy.html` | Privacy notice |
 | Terms | `/terms.html` | Terms of use |
 
 ## Current features
 
 - Public LeetCode username lookup without requesting LeetCode credentials.
+- Side-by-side comparison of two public profiles using consistent difficulty and submission metrics.
+- Private daily profile snapshots for signed-in users, with a historical solved-count trend and snapshot table.
+- Personal 7-day and 30-day problem-solving goals measured from saved profile baselines.
+- A deterministic 7-day practice planner based on difficulty coverage and public topic counts; the plan is editable and not persisted.
+- A private DSA revision queue and mistake journal with status tracking, optional problem links, topic labels and notes.
+- Browser-generated PNG profile cards for sharing, with no image upload to the server.
+- Public submission calendar heatmap with active days and current streak when available.
+- Contest rating, global rank, attended contest count and rating history.
+- Topic tag solved counts grouped by LeetCode's fundamental, intermediate and advanced levels.
 - Solved-problem counts by Easy, Medium, and Hard difficulty.
 - Accepted submissions, total submissions, and acceptance-rate overview.
 - Responsive product navigation, account pages, and consistent footer.
@@ -35,6 +45,7 @@ LeetMetric is an independent LeetCode statistics dashboard with a growing accoun
 - Password hashing with bcryptjs and signed HttpOnly session cookies.
 - Password-reset token flow with expiry and single-use semantics.
 - Validated contact-message persistence.
+- Account deletion requiring current-password and email confirmation, with transactional cleanup of account-owned analytics and practice data.
 - Server-side LeetCode GraphQL request with username validation, upstream timeout, and short-lived cache.
 - SEO sitemap, robots rules, favicon, and baseline security response headers.
 
@@ -59,6 +70,12 @@ Browser
         |
         +-- /api/user/profile
         |      +-- Saved LeetCode username
+        |
+        +-- /api/analytics/snapshots
+        |      +-- Mongoose ProfileSnapshot model
+        |
+        +-- /api/goals and /api/goals/:id
+        |      +-- Mongoose Goal model
         |
         +-- /api/contact
                +-- Mongoose ContactMessage model
@@ -157,17 +174,23 @@ Configure a Resend account, verify the sending domain/address, then add `RESEND_
 | POST | `/api/auth/forgot-password` | Request a reset email |
 | POST | `/api/auth/reset-password` | Set a new password |
 | GET / POST | `/api/user/profile` | Read or save a preferred username |
+| DELETE | `/api/user/account` | Permanently delete an authenticated account and owned data |
+| GET / POST | `/api/analytics/snapshots` | Read or save the signed-in user's daily profile snapshots |
+| GET / POST | `/api/goals` | List or create personal practice goals |
+| GET / POST | `/api/revisions` | List or add private DSA revision items |
+| PATCH / DELETE | `/api/revisions/:id` | Update or delete an owned revision item |
+| DELETE | `/api/goals/:id` | Delete an owned practice goal |
 | POST | `/api/contact` | Store a validated contact request |
 
 ## Quality checks
 
-Run JavaScript syntax checks for the frontend, server helpers, and API handlers:
+Run JavaScript syntax checks and the dependency-free LeetCode normalization unit tests with:
 
 ```bash
 npm run check
 ```
 
-The project should also be tested with a configured MongoDB database and a non-production email sender before enabling public account registration. Test successful signup/login/logout, duplicate email handling, invalid credentials, expired sessions, saved profile validation, reset token expiry/reuse, and contact form validation.
+GitHub Actions runs the same quality command on pushes to feature branches and on pull requests targeting main. The project should also be tested with a configured MongoDB database and a non-production email sender before enabling public account registration. Test successful signup/login/logout, duplicate email handling, invalid credentials, expired sessions, saved profile validation, reset token expiry/reuse, and contact form validation.
 
 ## Roadmap
 

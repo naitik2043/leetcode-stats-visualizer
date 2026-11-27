@@ -1,0 +1,41 @@
+/* Private problem revision queue */
+.revision-form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; align-items: end; }
+.revision-field { display: grid; gap: 7px; min-width: 0; }
+.revision-field-wide { grid-column: span 3; }
+.revision-field label { color: var(--copy-soft); font: 9px var(--page-mono); letter-spacing: .7px; }
+.revision-field input, .revision-field select, .revision-field textarea {
+  width: 100%; min-width: 0; padding: 10px 11px; border: 1px solid var(--page-line); border-radius: 8px;
+  background: var(--surface-inset); color: var(--field-text); font: 10px var(--page-font);
+}
+.revision-field input, .revision-field select { min-height: 40px; }
+.revision-field textarea { min-height: 76px; resize: vertical; line-height: 1.6; }
+.revision-field input:focus, .revision-field select:focus, .revision-field textarea:focus {
+  outline: 2px solid var(--page-accent); outline-offset: 2px;
+}
+.revision-form > button { grid-column: 1 / -1; justify-self: start; }
+.revision-queue-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--page-line); }
+.revision-queue-heading h3 { margin: 0; color: var(--text); font-size: 14px; }
+.revision-list { display: grid; gap: 10px; margin-top: 14px; }
+.revision-item { min-width: 0; padding: 15px; border: 1px solid var(--page-line); border-radius: 10px; background: var(--surface-inset); }
+.revision-item-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; }
+.revision-item-heading { min-width: 0; }
+.revision-item h4 { margin: 0; color: var(--text); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+.revision-item-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.revision-badge { padding: 4px 7px; border-radius: 5px; background: color-mix(in srgb, var(--page-accent) 13%, transparent); color: var(--page-accent); font-size: 8px; font-weight: 800; }
+.revision-badge-muted { background: color-mix(in srgb, var(--copy-soft) 12%, transparent); color: var(--copy-muted); }
+.revision-status-control { display: grid; gap: 5px; flex: 0 0 130px; }
+.revision-status-control span { color: var(--copy-soft); font: 8px var(--page-mono); letter-spacing: .7px; }
+.revision-status-control select { width: 100%; min-height: 33px; padding: 0 8px; border: 1px solid var(--page-line); border-radius: 7px; background: var(--surface-raised); color: var(--field-text); font: 9px var(--page-font); }
+.revision-problem-link { display: inline-block; margin-top: 10px; color: var(--page-accent); font-size: 9px; font-weight: 800; }
+.revision-notes { margin: 11px 0 0; padding: 10px 11px; border-left: 2px solid var(--page-line); background: color-mix(in srgb, var(--surface-raised) 65%, transparent); color: var(--copy-muted); font-size: 10px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.revision-item-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 12px; color: var(--copy-soft); font-size: 9px; }
+.revision-delete { border: 0; padding: 4px 0; background: transparent; color: #d36f6f; font: 700 9px var(--page-font); cursor: pointer; }
+.revision-delete:hover { text-decoration: underline; }
+@media (max-width: 760px) { .revision-form { grid-template-columns: repeat(2, minmax(0, 1fr)); } .revision-field-wide { grid-column: span 2; } }
+@media (max-width: 480px) {
+  .revision-form { grid-template-columns: 1fr; }
+  .revision-field-wide { grid-column: span 1; }
+  .revision-form > button { width: 100%; }
+  .revision-item-top { flex-direction: column; }
+  .revision-status-control { width: 100%; flex: 1 1 auto; }
+}

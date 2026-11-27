@@ -1,0 +1,50 @@
+.compare-main { width: min(100% - 48px, 1120px); margin: 0 auto; padding: 62px 0 85px; min-height: 70vh; }
+.compare-hero { max-width: 720px; margin-bottom: 30px; }
+.compare-hero h1 { margin: 13px 0; color: var(--text); font-size: clamp(42px, 6vw, 65px); line-height: 1.02; letter-spacing: -3px; }
+.compare-hero h1 span { color: var(--page-accent); }
+.compare-hero p:last-child { max-width: 600px; margin: 0; color: var(--copy-muted); font-size: 13px; line-height: 1.8; }
+.compare-search-card, .comparison-table-card { padding: 22px; border: 1px solid var(--page-line); border-radius: 14px; background: var(--surface-raised); }
+.compare-form { display: grid; grid-template-columns: minmax(0, 1fr) 36px minmax(0, 1fr) auto; gap: 13px; align-items: end; }
+.compare-input-group { display: grid; gap: 8px; }
+.compare-input-group label { color: var(--copy-soft); font: 9px var(--page-mono); letter-spacing: 1px; }
+.compare-input { display: flex; min-height: 46px; align-items: center; gap: 8px; padding: 0 11px; border: 1px solid var(--page-line); border-radius: 8px; background: var(--surface-inset); }
+.compare-input span { color: var(--copy-soft); font: 11px var(--page-mono); }
+.compare-input input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--field-text); font: 11px var(--page-mono); }
+.compare-versus { display: grid; place-items: center; height: 46px; color: var(--page-accent); font: 10px var(--page-mono); }
+.compare-form button { min-height: 46px; padding: 0 15px; border: 0; border-radius: 8px; background: var(--page-accent); color: #14200f; font: 800 10px var(--page-font); cursor: pointer; white-space: nowrap; }
+.compare-form button:disabled { opacity: .6; cursor: wait; }
+.compare-search-card .status-message { margin: 15px 0 0; color: var(--copy-muted); font-size: 10px; line-height: 1.6; }
+.compare-search-card .status-message.error { color: #d36f6f; }
+.compare-search-card .status-message.success { color: var(--page-accent); }
+.comparison-results { margin-top: 34px; }
+.comparison-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 14px; margin-bottom: 16px; }
+.comparison-heading h2 { margin: 7px 0 0; color: var(--text); font-size: 24px; }
+.comparison-heading > p { color: var(--copy-soft); font-size: 9px; }
+.comparison-profiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
+.comparison-profile-card { padding: 23px; border: 1px solid var(--page-line); border-radius: 12px; background: var(--surface-raised); }
+.profile-label { color: var(--copy-soft); font: 9px var(--page-mono); letter-spacing: 1px; }
+.comparison-profile-card h3 { overflow-wrap: anywhere; margin: 14px 0 10px; color: var(--text); font-size: 16px; }
+.comparison-profile-card strong { display: block; color: var(--page-accent); font-size: 35px; letter-spacing: -1px; }
+.comparison-profile-card > span:last-child { color: var(--copy-soft); font-size: 10px; }
+.comparison-table-card h3 { margin: 0 0 14px; color: var(--text); font-size: 14px; }
+.comparison-table-wrap { overflow-x: auto; }
+.comparison-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+.comparison-table th, .comparison-table td { padding: 13px 12px; border-bottom: 1px solid var(--page-line); text-align: right; white-space: nowrap; }
+.comparison-table th:first-child, .comparison-table td:first-child { text-align: left; }
+.comparison-table th { color: var(--copy-soft); font: 9px var(--page-mono); }
+.comparison-table td { color: var(--copy-muted); }
+.comparison-table td:last-child { color: var(--text); font-weight: 800; }
+.comparison-table tr:last-child td { border-bottom: 0; }
+.comparison-disclaimer { margin: 15px 0 0; color: var(--copy-soft); font-size: 9px; line-height: 1.7; }
+@media (max-width: 850px) { .compare-form { grid-template-columns: 1fr 36px 1fr; } .compare-form button { grid-column: 1/-1; } }
+@media (max-width: 600px) {
+  .compare-main { width: min(100% - 28px, 1120px); padding: 42px 0 60px; }
+  .compare-hero h1 { font-size: 44px; letter-spacing: -2px; }
+  .compare-search-card { padding: 17px; }
+  .compare-form { grid-template-columns: 1fr; }
+  .compare-versus { height: 20px; }
+  .compare-form button { grid-column: auto; width: 100%; }
+  .comparison-profiles { grid-template-columns: 1fr; }
+  .comparison-heading { align-items: flex-start; flex-direction: column; gap: 4px; }
+}
+:root[data-theme="light"] .compare-form button { background: #d9edb8; color: #263919; border: 1px solid #b7d78b; }
