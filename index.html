@@ -7,15 +7,11 @@
   <title>LeetMetric — Your coding, in focus</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css"><link rel="stylesheet" href="site.css">
 </head>
 <body>
   <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
-  <header class="site-header">
-    <a class="brand" href="#" aria-label="LeetMetric home"><span class="brand-mark">L<span>.</span></span><span>leet<span class="brand-light">metric</span></span></a>
-    <nav class="desktop-nav" aria-label="Main navigation"><a href="#overview">Overview</a><a href="#insights">Insights</a><a href="#how-it-works">How it works</a></nav>
-    <a class="header-cta" href="#lookup">Explore dashboard <span>↗</span></a>
-  </header>
+  <div id="site-header"></div>
   <main>
     <section class="hero" id="overview">
       <div class="hero-copy">
@@ -65,7 +61,7 @@
     </section>
     <section class="how-section" id="how-it-works"><div class="eyebrow">SIMPLE BY DESIGN</div><h2>Less noise.<br><span>More direction.</span></h2><div class="steps"><article><b>01</b><h3>Find your profile</h3><p>Enter a public LeetCode username. No account connection or credentials needed.</p></article><article><b>02</b><h3>Read your numbers</h3><p>See accepted problems, submission volume, and difficulty-level progress in one place.</p></article><article><b>03</b><h3>Choose your next step</h3><p>Use the breakdown to spot gaps and plan a more balanced practice routine.</p></article></div></section>
   </main>
-  <footer class="site-footer"><a class="brand footer-brand" href="#"><span class="brand-mark">L<span>.</span></span><span>leet<span class="brand-light">metric</span></span></a><p>Built for the long game. Keep showing up.</p><div class="footer-links"><a href="https://leetcode.com/" target="_blank" rel="noreferrer">LeetCode ↗</a><a href="https://github.com/naitik2043/leetcode-stats-visualizer" target="_blank" rel="noreferrer">GitHub ↗</a></div><small>© <span id="year"></span> LeetMetric. Independent community project; not affiliated with LeetCode.</small></footer>
-  <script src="script.js" defer></script>
+  <div id="site-footer"></div>
+  <script src="script.js" defer></script><script src="site.js" defer></script>
 </body>
 </html>
