@@ -4,11 +4,53 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
       ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/user/profile",
+      "destination": "/api/workspace/profile"
+    },
+    {
+      "source": "/api/user/account",
+      "destination": "/api/workspace/account"
+    },
+    {
+      "source": "/api/analytics/snapshots",
+      "destination": "/api/workspace/snapshots"
+    },
+    {
+      "source": "/api/goals",
+      "destination": "/api/workspace/goals"
+    },
+    {
+      "source": "/api/goals/:id",
+      "destination": "/api/workspace/goals/:id"
+    },
+    {
+      "source": "/api/revisions",
+      "destination": "/api/workspace/revisions"
+    },
+    {
+      "source": "/api/revisions/:id",
+      "destination": "/api/workspace/revisions/:id"
     }
   ]
 }
