@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d18">
+  <meta name="description" content="Understand your LeetCode practice patterns, topic coverage and next best steps with LeetMetric Performance Intelligence.">
+  <script src="/theme-init.js"></script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Performance Intelligence | LeetMetric</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/site.css">
+  <link rel="stylesheet" href="/intelligence-page.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <main class="page-main intelligence-page">
+    <section class="page-hero">
+      <div class="page-kicker">PERFORMANCE INTELLIGENCE</div>
+      <h1 class="page-title">Turn practice data<br><span style="color:var(--page-accent)">into your next move.</span></h1>
+      <p class="page-lead">Understand your activity rhythm, difficulty balance and topic coverage. LeetMetric turns the public profile data into clear, evidence-linked practice suggestions.</p>
+      <form id="intelligence-lookup" class="intel-search" novalidate>
+        <label for="intel-username">LEETCODE USERNAME</label>
+        <div class="intel-search-row">
+          <span aria-hidden="true">@</span>
+          <input id="intel-username" name="username" maxlength="30" autocomplete="off" placeholder="e.g. Naitik_Gupta" required>
+          <button id="intel-submit" class="primary-button" type="submit">Analyze profile <span aria-hidden="true">→</span></button>
+        </div>
+        <p class="intel-help">Public profile only. Never enter your LeetCode password, session cookie or access token.</p>
+      </form>
+      <p id="intel-status" class="intel-status" role="status" aria-live="polite">Enter a username to generate a performance report.</p>
+    </section>
+
+    <section id="intel-results" hidden aria-live="polite">
+      <div class="intel-result-heading">
+        <div><div class="page-kicker">PROFILE REPORT</div><h2 id="intel-profile-title">Performance overview</h2></div>
+        <span id="intel-fetched-at" class="intel-data-tag">PUBLIC PROFILE DATA</span>
+      </div>
+
+      <div class="intel-top-grid">
+        <article class="intel-score-card">
+          <div class="intel-card-kicker">PRACTICE FOUNDATION INDEX</div>
+          <div class="intel-score-line"><strong id="intel-score">—</strong><span>/ 100</span></div>
+          <h3 id="intel-score-label">Loading analysis</h3>
+          <p>This transparent practice index summarizes selected learning signals. It is not a hiring prediction or a guarantee of interview readiness.</p>
+          <div class="intel-score-track"><span id="intel-score-fill"></span></div>
+          <a class="intel-text-link" href="#intel-methodology">See scoring methodology ↓</a>
+        </article>
+        <article class="intel-stat-card">
+          <div class="intel-card-kicker">PRACTICE RHYTHM</div>
+          <div class="intel-stat-value" id="intel-active-days">—</div>
+          <p>Active days in the last 30 days</p>
+          <div class="intel-stat-divider"></div>
+          <div class="intel-stat-pair"><span>Last 7 days</span><strong id="intel-week-days">—</strong></div>
+          <div class="intel-stat-pair"><span>Submissions in 7 days</span><strong id="intel-week-submissions">—</strong></div>
+          <div class="intel-stat-pair"><span>Current streak</span><strong id="intel-streak">—</strong></div>
+        </article>
+        <article class="intel-stat-card">
+          <div class="intel-card-kicker">DIFFICULTY MIX</div>
+          <div class="intel-stat-value" id="intel-solved-total">—</div>
+          <p>Unique solved-problem count</p>
+          <div class="intel-stat-divider"></div>
+          <div class="intel-stat-pair"><span>Easy</span><strong id="intel-easy">—</strong></div>
+          <div class="intel-stat-pair"><span>Medium</span><strong id="intel-medium">—</strong></div>
+          <div class="intel-stat-pair"><span>Hard</span><strong id="intel-hard">—</strong></div>
+        </article>
+      </div>
+
+      <div class="intel-content-grid">
+        <article class="intel-panel">
+          <div class="intel-panel-heading"><div class="page-kicker">YOUR NEXT MOVES</div><h2>Evidence-based recommendations</h2></div>
+          <div id="intel-recommendations" class="intel-recommendations"></div>
+        </article>
+        <article class="intel-panel">
+          <div class="intel-panel-heading"><div class="page-kicker">TOPIC COVERAGE</div><h2>Potential focus areas</h2></div>
+          <p class="intel-panel-note">These are lower solved-count candidates among tags returned by LeetCode. They are not mastery scores or proof of weakness.</p>
+          <div id="intel-topics" class="intel-topic-list"></div>
+        </article>
+      </div>
+
+      <article class="intel-panel intel-components-panel">
+        <div class="intel-panel-heading"><div class="page-kicker">HOW THE INDEX IS BUILT</div><h2>Practice signals</h2></div>
+        <div id="intel-components" class="intel-components"></div>
+        <p id="intel-methodology" class="intel-methodology"></p>
+      </article>
+
+      <article class="intel-panel">
+        <div class="intel-panel-heading"><div class="page-kicker">DATA LIMITATIONS</div><h2>Read the signals carefully</h2></div>
+        <ul id="intel-notes" class="intel-notes"></ul>
+      </article>
+      <div class="intel-actions">
+        <a class="primary-button intel-action-link" href="/roadmap.html">Build my DSA roadmap <span aria-hidden="true">→</span></a>
+        <a class="intel-secondary-link" href="/reports.html">Export a progress report ↗</a>
+      </div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="/intelligence-engine.js"></script>
+  <script src="/intelligence-page.js" defer></script>
+  <script src="/site.js" defer></script>
+</body>
+</html>
