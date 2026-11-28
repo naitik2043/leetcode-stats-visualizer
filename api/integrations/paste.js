@@ -7,27 +7,15 @@ const {
   rateLimit,
   methodNotAllowed
 } = require("../../server/auth");
+const { getPasteAppOrigin } = require("../../server/pasteAppConfig");
 const IntegrationTicket = require("../../server/models/IntegrationTicket");
-
-function pasteAppOrigin() {
-  const configured = String(process.env.PASTE_APP_URL || "").trim();
-  if (!configured) return null;
-  try {
-    const parsed = new URL(configured);
-    const localHttp = parsed.protocol === "http:" && ["localhost", "127.0.0.1"].includes(parsed.hostname);
-    if (parsed.protocol !== "https:" && !localHttp) return null;
-    return parsed.origin;
-  } catch {
-    return null;
-  }
-}
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") return methodNotAllowed(req, res, "POST");
   if (!enforceSameOrigin(req, res)) return;
   if (!rateLimit(req, res, "paste-vault-launch", 10, 15 * 60 * 1000)) return;
 
-  const appOrigin = pasteAppOrigin();
+  const appOrigin = getPasteAppOrigin(process.env.PASTE_APP_URL);
   if (!appOrigin) {
     return json(res, 503, { error: "Code Vault is not configured on this deployment yet." });
   }

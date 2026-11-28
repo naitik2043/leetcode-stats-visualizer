@@ -3,7 +3,6 @@ const User = require("./models/User");
 
 const COOKIE_NAME = "leetmetric_session";
 const SESSION_SECONDS = 60 * 60 * 24 * 7;
-const MAX_RATE_LIMIT_BUCKETS = 5000;
 const rateBuckets = new Map();
 
 function json(res, status, payload) {
@@ -25,12 +24,7 @@ function cookies(req) {
   return Object.fromEntries(header.split(";").map((part) => {
     const separator = part.indexOf("=");
     if (separator < 0) return ["", ""];
-    const key = part.slice(0, separator).trim();
-    try {
-      return [key, decodeURIComponent(part.slice(separator + 1).trim())];
-    } catch {
-      return [key, ""];
-    }
+    return [part.slice(0, separator).trim(), decodeURIComponent(part.slice(separator + 1).trim())];
   }).filter(([key]) => key));
 }
 
@@ -50,16 +44,11 @@ function clearSessionCookie(res) {
 }
 
 function isSameOrigin(req) {
-  const origin = req.headers?.origin;
-  // Modern browsers send Sec-Fetch-Site even when Origin is omitted. Reject an
-  // explicitly cross-site request rather than treating a missing Origin as trusted.
-  if (!origin) return req.headers?.["sec-fetch-site"] !== "cross-site";
-
+  const origin = req.headers.origin;
+  if (!origin) return true;
   try {
-    const requestHost = String(
-      req.headers?.["x-forwarded-host"] || req.headers?.host || ""
-    ).split(",")[0].trim().toLowerCase();
-    return Boolean(requestHost) && new URL(origin).host.toLowerCase() === requestHost;
+    const requestHost = req.headers["x-forwarded-host"] || req.headers.host;
+    return new URL(origin).host === requestHost;
   } catch {
     return false;
   }
@@ -71,37 +60,22 @@ function enforceSameOrigin(req, res) {
   return false;
 }
 
-function rateLimit(req, res, key, maxRequests = 8, windowMs = 15 * 60 * 1000, now = Date.now()) {
-  const forwarded = String(req.headers?.["x-forwarded-for"] || "").split(",")[0].trim();
+function rateLimit(req, res, key, maxRequests = 8, windowMs = 15 * 60 * 1000) {
+  const forwarded = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim();
   const ip = forwarded || req.socket?.remoteAddress || "unknown";
   const bucketKey = `${key}:${ip}`;
+  const now = Date.now();
   const current = rateBuckets.get(bucketKey);
-
   if (!current || current.resetAt <= now) {
-    rateBuckets.delete(bucketKey);
-    // Expired keys are removed on bucket creation so this process-local limiter
-    // cannot grow without bound when many unique client IPs make requests.
-    for (const [storedKey, bucket] of rateBuckets) {
-      if (bucket.resetAt <= now) rateBuckets.delete(storedKey);
-    }
-    if (rateBuckets.size >= MAX_RATE_LIMIT_BUCKETS) {
-      const oldestKey = rateBuckets.keys().next().value;
-      if (oldestKey !== undefined) rateBuckets.delete(oldestKey);
-    }
     rateBuckets.set(bucketKey, { count: 1, resetAt: now + windowMs });
     return true;
   }
-
   if (current.count >= maxRequests) {
     res.setHeader("Retry-After", String(Math.max(1, Math.ceil((current.resetAt - now) / 1000))));
     json(res, 429, { error: "Too many attempts. Please wait a little and try again." });
     return false;
   }
-
   current.count += 1;
-  // Keep recently used buckets at the end so capacity eviction removes the oldest.
-  rateBuckets.delete(bucketKey);
-  rateBuckets.set(bucketKey, current);
   return true;
 }
 
@@ -141,5 +115,5 @@ function isValidEmail(email) {
 
 module.exports = {
   json, requireSecret, setSessionCookie, clearSessionCookie, enforceSameOrigin,
-  isSameOrigin, rateLimit, getSessionUser, publicUser, methodNotAllowed, isValidEmail
+  rateLimit, getSessionUser, publicUser, methodNotAllowed, isValidEmail
 };
