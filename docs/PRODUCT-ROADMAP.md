@@ -39,6 +39,7 @@ This roadmap is the source of truth for shipped and planned work. A capability i
 - [x] Transparent practice foundation index with published equal-weight methodology.
 - [x] Evidence-linked practice recommendations and lower solved-count topic candidates.
 - [x] Private mistake-pattern summary derived only from the signed-in user's revision records.
+- [x] Optional user-recorded attempts-before-acceptance and time-spent metadata, validated and aggregated only from the owner's private revision items.
 - [x] Personalized 7-day, 30-day and 90-day roadmap generator.
 - [x] Browser-local roadmap completion tracking and JSON export.
 - [x] Multilingual static code review lab for C++, Java, Python, JavaScript and C.
@@ -53,7 +54,7 @@ This roadmap is the source of truth for shipped and planned work. A capability i
 - LeetMetric relies on LeetCode's public GraphQL endpoint; it is not a guaranteed, versioned commercial API and may return partial data or change fields.
 - Public profile calendar entries are submission counts, not unique accepted problems, exact study time or complete attempt-level histories.
 - The topic intelligence engine uses tag-level solved counts as directional coverage signals. Tag categories overlap and do not establish mastery.
-- First-attempt success, retries per problem and time-to-solve cannot be reliably inferred from the current public profile response. These require separately collected user data or an authorized data source.
+- First-attempt success, retries per problem and time-to-solve cannot be reliably inferred from the current public profile response. LeetMetric therefore offers optional manual fields in the private revision journal; their aggregate reflects only the problems the user records and is not a complete account-wide rate.
 - The practice foundation index measures a deliberately small set of observable signals. It is not a hiring prediction or a validated interview-readiness score.
 - The roadmap generator creates an editable study outline, not a verified list of LeetCode problem URLs. Roadmap completion is stored in the current browser, not the account database.
 - The Code Review Lab is static pattern matching. It is not an AST-based compiler, AI reviewer, execution sandbox, complexity proof or correctness verifier.

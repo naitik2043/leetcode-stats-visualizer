@@ -50,6 +50,7 @@ LeetMetric is an independent LeetCode analytics and learning workspace. It turns
 - Transparent practice foundation index: equal-weight components for problem volume, Medium/Hard balance, topic breadth and 30-day activity consistency.
 - Lower solved-count topic candidates and evidence-linked practice suggestions.
 - Private revision mistake summary derived from the signed-in user's saved revision entries.
+- Optional user-recorded attempts-before-acceptance and time-spent fields per revision, with aggregate first-attempt rate and average logged time. These represent only the entries the user records, not all LeetCode submissions.
 - Personalized 7-day, 30-day and 90-day DSA roadmap generation, local completion checkboxes and JSON export.
 - Browser-only static code review heuristics for common loop, sorting and collection patterns.
 - Interview preparation self-assessment combining a DSA practice signal with user-entered ratings for CS fundamentals, project ownership, communication, mock interviews and resume alignment.
@@ -69,7 +70,7 @@ LeetMetric deliberately labels derived metrics and heuristics:
 - Interview self-assessment ratings are user-entered and saved in the current browser.
 - Next-milestone timing is a linear estimate only when snapshots span at least 7 days and show positive net growth. It can change as pace changes.
 - Private history is returned only to the authenticated account that owns the selected LeetCode username.
-- First-attempt success, per-problem retries and time-to-solve are not inferred from the current public profile response.
+- First-attempt success, per-problem retries and time-to-solve are not inferred from the current public profile response. Optional attempt and time analytics are based only on values voluntarily recorded in the private revision journal.
 - Codeforces and GitHub profile lookups are read-only public username lookups, not OAuth identity verification. GitHub profile endpoints are subject to GitHub public API rate limits.
 
 ## Architecture
