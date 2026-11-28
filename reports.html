@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d18"><meta name="description" content="Generate and export a LeetMetric DSA progress report with profile metrics, activity and historical snapshots.">
+  <script src="/theme-init.js"></script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"><title>Progress Reports | LeetMetric</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/site.css"><link rel="stylesheet" href="/reports.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <main class="page-main reports-page">
+    <section class="page-hero">
+      <div class="page-kicker">PERSONAL ANALYTICS EXPORT</div>
+      <h1 class="page-title">Your progress,<br><span style="color:var(--page-accent)">clearly reported.</span></h1>
+      <p class="page-lead">Create an exportable snapshot of your public LeetCode profile, practice signals and saved history. Export structured JSON or a spreadsheet-friendly CSV.</p>
+      <form id="report-form" class="report-search" novalidate>
+        <label for="report-username">LEETCODE USERNAME</label>
+        <div><span aria-hidden="true">@</span><input id="report-username" maxlength="30" autocomplete="off" placeholder="e.g. Naitik_Gupta" required><button class="primary-button" id="report-submit" type="submit">Build report →</button></div>
+      </form>
+      <p id="report-status" class="report-status" role="status" aria-live="polite">Choose a public profile to generate a report.</p>
+    </section>
+
+    <section id="report-results" hidden>
+      <div class="report-heading"><div><div class="page-kicker">REPORT PREVIEW</div><h2 id="report-title">Progress report</h2></div><div class="report-actions"><button id="report-json" type="button">Download JSON</button><button id="report-csv" type="button">Download CSV</button><button id="report-print" type="button">Print report</button></div></div>
+      <div class="report-metric-grid">
+        <article><span>PROBLEMS SOLVED</span><strong id="report-solved">—</strong></article>
+        <article><span>ACCEPTANCE RATE</span><strong id="report-acceptance">—</strong></article>
+        <article><span>ACTIVE DAYS · 30D</span><strong id="report-active">—</strong></article>
+        <article><span>PRACTICE INDEX</span><strong id="report-index">—</strong></article>
+      </div>
+      <div class="report-panels">
+        <article class="report-panel"><div class="page-kicker">DIFFICULTY PROFILE</div><h3>Problem distribution</h3><div id="report-difficulty"></div></article>
+        <article class="report-panel"><div class="page-kicker">HISTORICAL SNAPSHOTS</div><h3>Recorded progress</h3><p id="report-history-summary">Sign in and save daily snapshots from your dashboard to build a private trend.</p><div id="report-history"></div></article>
+      </div>
+      <article class="report-panel report-topics"><div class="page-kicker">TOPIC SIGNALS</div><h3>Lower solved-count topics</h3><p>Topics are sorted by public tag-level solved count. Overlapping tags mean these figures should not be summed.</p><div id="report-topics"></div></article>
+      <p class="report-disclaimer">This report combines public LeetCode profile fields with LeetMetric-derived practice signals. Historical snapshots are available only to the signed-in account that owns them. Metrics can be partial when LeetCode's public data source changes.</p>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="/intelligence-engine.js"></script><script src="/reports.js" defer></script><script src="/site.js" defer></script>
+</body>
+</html>
