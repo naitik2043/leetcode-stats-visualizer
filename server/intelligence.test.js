@@ -121,3 +121,19 @@ test("withholds progress projections when history is short or has no net growth"
   assert.equal(stagnant.available, false);
   assert.match(stagnant.reason, /positive net growth/);
 });
+
+test("summarizes only user-recorded attempt and time signals", () => {
+  const result = intelligence.summarizeMistakes([
+    { mistakeType: "edge-cases", status: "queued", attemptsBeforeAccepted: 1, timeSpentMinutes: 12 },
+    { mistakeType: "complexity", status: "mastered", attemptsBeforeAccepted: 3, timeSpentMinutes: 20 },
+    { mistakeType: "other", status: "reviewing", attemptsBeforeAccepted: null, timeSpentMinutes: null },
+    { mistakeType: "other", status: "queued", attemptsBeforeAccepted: 0, timeSpentMinutes: 900 }
+  ]);
+  assert.equal(result.behavior.attemptRecords, 2);
+  assert.equal(result.behavior.firstAttemptAccepted, 1);
+  assert.equal(result.behavior.firstAttemptRate, 50);
+  assert.equal(result.behavior.averageAttemptsToAccepted, 2);
+  assert.equal(result.behavior.timeRecords, 2);
+  assert.equal(result.behavior.totalTimeSpentMinutes, 32);
+  assert.equal(result.behavior.averageTimeSpentMinutes, 16);
+});

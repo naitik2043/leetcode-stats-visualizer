@@ -119,6 +119,10 @@
       document.getElementById("intel-mistake-total").textContent = number(summary.total);
       document.getElementById("intel-mistake-open").textContent = number(summary.open);
       document.getElementById("intel-mistake-mastered").textContent = number(summary.mastered);
+      document.getElementById("intel-mistake-first-rate").textContent =
+        summary.behavior.firstAttemptRate === null ? "—" : summary.behavior.firstAttemptRate + "%";
+      document.getElementById("intel-mistake-average-time").textContent =
+        summary.behavior.averageTimeSpentMinutes === null ? "—" : summary.behavior.averageTimeSpentMinutes + " min";
       types.replaceChildren();
       summary.byType.forEach((item) => {
         const row = node("div", "intel-mistake-type");

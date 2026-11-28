@@ -78,6 +78,12 @@
         element("span", "revision-badge revision-badge-muted", item.topic || "Topic not set"),
         element("span", "revision-badge revision-badge-muted", labels[item.mistakeType] || "Other")
       );
+      if (Number.isInteger(item.attemptsBeforeAccepted) && item.attemptsBeforeAccepted > 0) {
+        meta.append(element("span", "revision-badge revision-badge-muted", "Accepted in " + item.attemptsBeforeAccepted + " attempt(s)"));
+      }
+      if (Number.isInteger(item.timeSpentMinutes) && item.timeSpentMinutes > 0) {
+        meta.append(element("span", "revision-badge revision-badge-muted", item.timeSpentMinutes + " min logged"));
+      }
       heading.append(meta);
       const statusWrap = element("label", "revision-status-control");
       statusWrap.append(element("span", "", "STATUS"));

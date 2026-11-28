@@ -88,12 +88,28 @@
       counts[type] = (counts[type] || 0) + 1;
     });
     const ranked = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const attempts = items
+      .map((item) => Number(item && item.attemptsBeforeAccepted))
+      .filter((value) => Number.isSafeInteger(value) && value >= 1 && value <= 100);
+    const durations = items
+      .map((item) => Number(item && item.timeSpentMinutes))
+      .filter((value) => Number.isSafeInteger(value) && value >= 1 && value <= 600);
+    const firstAttemptAccepted = attempts.filter((value) => value === 1).length;
     return {
       total: items.length,
       mastered: items.filter((item) => item && item.status === "mastered").length,
       open: items.filter((item) => item && item.status !== "mastered").length,
       byType: ranked.map(([type, count]) => ({ type, count })),
-      topPattern: ranked.length ? ranked[0][0] : null
+      topPattern: ranked.length ? ranked[0][0] : null,
+      behavior: {
+        attemptRecords: attempts.length,
+        firstAttemptAccepted,
+        firstAttemptRate: attempts.length ? round((firstAttemptAccepted / attempts.length) * 100) : null,
+        averageAttemptsToAccepted: attempts.length ? round(attempts.reduce((sum, value) => sum + value, 0) / attempts.length) : null,
+        timeRecords: durations.length,
+        totalTimeSpentMinutes: durations.reduce((sum, value) => sum + value, 0),
+        averageTimeSpentMinutes: durations.length ? round(durations.reduce((sum, value) => sum + value, 0) / durations.length) : null
+      }
     };
   }
 
