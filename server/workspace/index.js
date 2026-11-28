@@ -117,16 +117,39 @@ async function handleAccountDeletion(req, res) {
         await CodePaste.deleteMany({ userId: user._id }, { session });
         await IntegrationTicket.deleteMany({ userId: user._id }, { session });
         await Roadmap.deleteMany({ userId: user._id }, { session });
+        await Roadmap.deleteMany({ userId: user._id }, { session });
         await User.deleteOne({ _id: user._id }, { session });
       });
     } finally {
       await session.endSession();
     }
 
+    const remaining = await Promise.all([
+      ProfileSnapshot.countDocuments({ userId: user._id }),
+      Goal.countDocuments({ userId: user._id }),
+      RevisionItem.countDocuments({ userId: user._id }),
+      CodePaste.countDocuments({ userId: user._id }),
+      IntegrationTicket.countDocuments({ userId: user._id }),
+      Roadmap.countDocuments({ userId: user._id }),
+      User.countDocuments({ _id: user._id })
+    ]);
+    const verification = {
+      snapshots: remaining[0],
+      goals: remaining[1],
+      revisions: remaining[2],
+      codeVaultItems: remaining[3],
+      integrationTickets: remaining[4],
+      roadmaps: remaining[5],
+      account: remaining[6],
+      verified: remaining.every((count) => count === 0)
+    };
     clearSessionCookie(res);
-    return json(res, 200, {
-      ok: true,
-      message: "Your account, saved profiles, snapshots, goals, revision items, Code Vault snippets and unused launch tickets have been deleted."
+    return json(res, verification.verified ? 200 : 500, {
+      ok: verification.verified,
+      message: verification.verified
+        ? "Your account and owned workspace data were deleted. A follow-up database check found zero remaining records."
+        : "The deletion transaction completed but verification found remaining records. Contact support before creating a new account.",
+      verification
     });
   } catch (error) {
     if (isConfigurationError(error)) {
@@ -136,6 +159,88 @@ async function handleAccountDeletion(req, res) {
     return json(res, 500, {
       error: "We could not complete account deletion. No success was reported; please try again or contact support."
     });
+  }
+}
+
+
+async function handleAccountExport(req, res) {
+  if (req.method !== "GET") return methodNotAllowed(req, res, "GET");
+  if (!enforceSameOrigin(req, res)) return;
+
+  try {
+    await connectToDatabase();
+    const user = await getSessionUser(req);
+    if (!user) return json(res, 401, { error: "Sign in to export your account data." });
+
+    const userId = user._id;
+    const [snapshots, goals, revisions, roadmaps, codeVaultCount] = await Promise.all([
+      ProfileSnapshot.find({ userId }).sort({ dateKey: 1 }).limit(180).lean(),
+      Goal.find({ userId }).sort({ createdAt: 1 }).limit(100).lean(),
+      RevisionItem.find({ userId }).sort({ createdAt: 1 }).limit(100).lean(),
+      Roadmap.find({ userId }).sort({ createdAt: 1 }).limit(20).lean(),
+      CodePaste.countDocuments({ userId })
+    ]);
+    if (codeVaultCount > 200) {
+      return json(res, 413, { error: "Your Code Vault contains more than 200 snippets. Export or archive some snippets first, then retry the account export." });
+    }
+
+    const codeVaultItems = await CodePaste.find({ userId })
+      .select("title content language category problemTitle problemUrl difficulty topic approach timeComplexity spaceComplexity keyTakeaway tags visibility isPinned history createdAt updatedAt")
+      .sort({ createdAt: 1 }).limit(200).lean();
+    const safeCodeVaultItems = codeVaultItems.map((item) => ({
+      id: String(item._id),
+      title: item.title,
+      content: item.content,
+      language: item.language,
+      category: item.category,
+      problemTitle: item.problemTitle,
+      problemUrl: item.problemUrl,
+      difficulty: item.difficulty,
+      topic: item.topic,
+      approach: item.approach,
+      timeComplexity: item.timeComplexity,
+      spaceComplexity: item.spaceComplexity,
+      keyTakeaway: item.keyTakeaway,
+      tags: item.tags,
+      visibility: item.visibility,
+      isPinned: item.isPinned,
+      history: item.history,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt
+    }));
+
+    const payload = {
+      schemaVersion: 1,
+      product: "LeetMetric",
+      exportedAt: new Date().toISOString(),
+      account: publicUser(user),
+      data: {
+        profileSnapshots: snapshots.map(snapshotPayload),
+        goals: goals.map((goal) => ({
+          id: String(goal._id), title: goal.title, username: goal.username,
+          metric: goal.metric, target: goal.target, baselineValue: goal.baselineValue,
+          period: goal.period, startsAt: goal.startsAt, dueAt: goal.dueAt,
+          status: goal.status, createdAt: goal.createdAt, updatedAt: goal.updatedAt
+        })),
+        revisionItems: revisions.map(revisionPayload),
+        roadmaps: roadmaps.map(roadmapPayload),
+        codeVaultItems: safeCodeVaultItems
+      },
+      exclusions: [
+        "Password hashes, session tokens, password-reset tokens and integration launch tickets are never exported.",
+        "Unlisted Code Vault share identifiers are not included. The underlying snippet content and visibility setting are included.",
+        "Contact messages are not part of this personal workspace export."
+      ]
+    };
+    const filename = "leetmetric-account-export-" + payload.exportedAt.slice(0, 10) + ".json";
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    res.setHeader("Content-Disposition", 'attachment; filename="' + filename + '"');
+    res.setHeader("Cache-Control", "no-store");
+    return res.status(200).json(payload);
+  } catch (error) {
+    if (isConfigurationError(error)) return sendConfigurationError(res, "Account export is unavailable until account storage is configured.");
+    logFailure("account_data_export_failed", error);
+    return json(res, 500, { error: "Unable to export your account data right now." });
   }
 }
 
@@ -624,6 +729,7 @@ module.exports = async function workspaceHandler(req, res) {
     .filter((part) => typeof part === "string" && part.length > 0);
 
   if (segments.length === 1 && segments[0] === "profile") return handleProfile(req, res);
+  if (segments.length === 1 && segments[0] === "export") return handleAccountExport(req, res);
   if (segments.length === 1 && segments[0] === "roadmaps") return handleRoadmaps(req, res);
   if (segments.length === 2 && segments[0] === "roadmaps") return handleRoadmapItem(req, res, segments[1]);
   if (segments.length === 1 && segments[0] === "account") return handleAccountDeletion(req, res);

@@ -59,6 +59,10 @@
     {
       "source": "/api/roadmaps/:id",
       "destination": "/api/workspace/roadmaps/:id"
+    },
+    {
+      "source": "/api/user/export",
+      "destination": "/api/workspace/export"
     }
   ]
 }
