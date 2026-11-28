@@ -89,21 +89,16 @@
     };
   }
 
-  async function requestJson(url, headers) {
+  async function getJson(url) {
     const response = await fetch(url, {
       method: "GET",
-      headers: Object.assign({ Accept: "application/json" }, headers || {}),
+      headers: { Accept: "application/json" },
+      credentials: "same-origin",
       signal: AbortSignal.timeout(10000)
     });
     const body = await response.json().catch(() => ({}));
     if (!response.ok) {
-      const error = new Error(
-        response.status === 403 || response.status === 429
-          ? "The platform rate limit was reached. Try again later."
-          : response.status === 404
-            ? "That public profile was not found."
-            : "The platform request failed (HTTP " + response.status + ")."
-      );
+      const error = new Error(body.error || "Unable to load the public platform profile.");
       error.status = response.status;
       throw error;
     }
@@ -116,33 +111,24 @@
     if (entry) cache.delete(key);
     const value = await loader();
     cache.set(key, { value, expiresAt: Date.now() + CACHE_TTL_MS });
+    while (cache.size > 100) cache.delete(cache.keys().next().value);
     return value;
   }
 
   async function fetchCodeforces(handle) {
     const username = String(handle || "").trim();
     if (!USERNAME.test(username)) throw new Error("Enter a valid Codeforces handle.");
-    return cached("cf:" + username.toLowerCase(), async () => {
-      const payload = await requestJson("https://codeforces.com/api/user.info?handles=" + encodeURIComponent(username));
-      return normalizeCodeforces(payload);
-    });
+    return cached("cf:" + username.toLowerCase(), () =>
+      getJson("/api/developer/codeforces/" + encodeURIComponent(username))
+    );
   }
 
   async function fetchGitHub(username) {
     const handle = String(username || "").trim();
     if (!USERNAME.test(handle)) throw new Error("Enter a valid GitHub username.");
-    return cached("gh:" + handle.toLowerCase(), async () => {
-      const headers = {
-        Accept: "application/vnd.github+json",
-        "X-GitHub-Api-Version": "2026-03-10"
-      };
-      const profile = await requestJson("https://api.github.com/users/" + encodeURIComponent(handle), headers);
-      const repositories = await requestJson(
-        "https://api.github.com/users/" + encodeURIComponent(handle) + "/repos?per_page=100&sort=updated&type=owner",
-        headers
-      );
-      return normalizeGitHub(profile, repositories);
-    });
+    return cached("gh:" + handle.toLowerCase(), () =>
+      getJson("/api/developer/github/" + encodeURIComponent(handle))
+    );
   }
 
   function clearCache() {
