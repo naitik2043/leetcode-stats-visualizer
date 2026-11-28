@@ -164,7 +164,6 @@ async function handleAccountDeletion(req, res) {
         await CodePaste.deleteMany({ userId: user._id }, { session });
         await IntegrationTicket.deleteMany({ userId: user._id }, { session });
         await Roadmap.deleteMany({ userId: user._id }, { session });
-        await Roadmap.deleteMany({ userId: user._id }, { session });
         await User.deleteOne({ _id: user._id }, { session });
       });
     } finally {
@@ -197,8 +196,7 @@ async function handleAccountDeletion(req, res) {
         ? "Your account and owned workspace data were deleted. A follow-up database check found zero remaining records."
         : "The deletion transaction completed but verification found remaining records. Contact support before creating a new account.",
       verification
-    });
-  } catch (error) {
+    });  } catch (error) {
     if (isConfigurationError(error)) {
       return sendConfigurationError(res, "Account deletion is unavailable until account storage is configured.");
     }
@@ -397,8 +395,7 @@ async function handleSnapshots(req, res) {
         setDefaultsOnInsert: true
       }).lean();
     } catch (error) {
-      // Resolve concurrent requests racing against the unique daily snapshot index.
-      if (error.code !== 11000) throw error;
+      // Resolve concurrent requests racing against the unique daily snapshot index.      if (error.code !== 11000) throw error;
       snapshot = await ProfileSnapshot.findOneAndUpdate(filter, { $set: update.$set }, {
         new: true,
         runValidators: true
@@ -597,8 +594,7 @@ async function handleRevisions(req, res) {
 
     const usernameKey = user.leetcodeUsername.toLowerCase();
     if (req.method === "GET") {
-      const items = await RevisionItem.find({ userId: user._id, usernameKey })
-        .sort({ updatedAt: -1 }).limit(100).lean();
+      const items = await RevisionItem.find({ userId: user._id, usernameKey })        .sort({ updatedAt: -1 }).limit(100).lean();
       return json(res, 200, {
         username: user.leetcodeUsername,
         revisions: items.map(revisionPayload),
