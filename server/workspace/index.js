@@ -173,15 +173,26 @@ async function handleAccountExport(req, res) {
     if (!user) return json(res, 401, { error: "Sign in to export your account data." });
 
     const userId = user._id;
-    const [snapshots, goals, revisions, roadmaps, codeVaultCount] = await Promise.all([
+    const [snapshots, goals, revisions, roadmaps, snippetStats] = await Promise.all([
       ProfileSnapshot.find({ userId }).sort({ dateKey: 1 }).limit(180).lean(),
       Goal.find({ userId }).sort({ createdAt: 1 }).limit(100).lean(),
       RevisionItem.find({ userId }).sort({ createdAt: 1 }).limit(100).lean(),
       Roadmap.find({ userId }).sort({ createdAt: 1 }).limit(20).lean(),
-      CodePaste.countDocuments({ userId })
+      CodePaste.aggregate([
+        { $match: { userId } },
+        { $group: {
+          _id: null,
+          count: { $sum: 1 },
+          contentBytes: { $sum: { $strLenBytes: { $ifNull: ["$content", ""] } } }
+        } }
+      ])
     ]);
-    if (codeVaultCount > 200) {
-      return json(res, 413, { error: "Your Code Vault contains more than 200 snippets. Export or archive some snippets first, then retry the account export." });
+    const codeVaultCount = snippetStats[0]?.count || 0;
+    const codeVaultContentBytes = snippetStats[0]?.contentBytes || 0;
+    if (codeVaultCount > 200 || codeVaultContentBytes > 3 * 1024 * 1024) {
+      return json(res, 413, {
+        error: "Your Code Vault export exceeds the safe 3 MB snippet-content limit. Export or archive some snippets first, then retry."
+      });
     }
 
     const codeVaultItems = await CodePaste.find({ userId })
@@ -232,11 +243,15 @@ async function handleAccountExport(req, res) {
         "Contact messages are not part of this personal workspace export."
       ]
     };
+    const serialized = JSON.stringify(payload);
+    if (Buffer.byteLength(serialized, "utf8") > 4 * 1024 * 1024) {
+      return json(res, 413, { error: "Your account export exceeds the 4 MB response limit. Export or archive some Code Vault content and retry." });
+    }
     const filename = "leetmetric-account-export-" + payload.exportedAt.slice(0, 10) + ".json";
     res.setHeader("Content-Type", "application/json; charset=utf-8");
     res.setHeader("Content-Disposition", 'attachment; filename="' + filename + '"');
     res.setHeader("Cache-Control", "no-store");
-    return res.status(200).json(payload);
+    return res.status(200).send(serialized);
   } catch (error) {
     if (isConfigurationError(error)) return sendConfigurationError(res, "Account export is unavailable until account storage is configured.");
     logFailure("account_data_export_failed", error);

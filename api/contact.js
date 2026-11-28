@@ -1,11 +1,11 @@
 const connectToDatabase = require("../server/db");
 const ContactMessage = require("../server/models/ContactMessage");
-const { json, enforceSameOrigin, rateLimit, methodNotAllowed, isValidEmail } = require("../server/auth");
+const { json, enforceSameOrigin, rateLimitShared, methodNotAllowed, isValidEmail } = require("../server/auth");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") return methodNotAllowed(req, res, "POST");
   if (!enforceSameOrigin(req, res)) return;
-  if (!rateLimit(req, res, "contact", 5, 60 * 60 * 1000)) return;
+  if (!await rateLimitShared(req, res, "contact", 5, 60 * 60 * 1000)) return;
 
   const { name, email, subject, message } = req.body || {};
   const fields = {

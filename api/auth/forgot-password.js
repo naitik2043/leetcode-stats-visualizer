@@ -1,12 +1,12 @@
 const crypto = require("crypto");
 const connectToDatabase = require("../../server/db");
 const User = require("../../server/models/User");
-const { json, enforceSameOrigin, rateLimit, methodNotAllowed, isValidEmail } = require("../../server/auth");
+const { json, enforceSameOrigin, rateLimitShared, methodNotAllowed, isValidEmail } = require("../../server/auth");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") return methodNotAllowed(req, res, "POST");
   if (!enforceSameOrigin(req, res)) return;
-  if (!rateLimit(req, res, "forgot-password", 4)) return;
+  if (!await rateLimitShared(req, res, "forgot-password", 4)) return;
 
   const email = typeof req.body?.email === "string" ? req.body.email.trim().toLowerCase() : "";
   if (!isValidEmail(email)) return json(res, 400, { error: "Enter a valid email address." });

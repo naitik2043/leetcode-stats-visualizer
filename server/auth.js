@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const User = require("./models/User");
 
 const COOKIE_NAME = "leetmetric_session";
@@ -105,6 +106,61 @@ function rateLimit(req, res, key, maxRequests = 8, windowMs = 15 * 60 * 1000, no
   return true;
 }
 
+
+const DISTRIBUTED_LIMIT_SCRIPT = [
+  "local current = redis.call('INCR', KEYS[1])",
+  "if current == 1 then redis.call('PEXPIRE', KEYS[1], ARGV[1]) end",
+  "local ttl = redis.call('PTTL', KEYS[1])",
+  "return { current, ttl }"
+].join("\n");
+
+async function rateLimitShared(req, res, key, maxRequests = 8, windowMs = 15 * 60 * 1000, options = {}) {
+  const url = options.url === undefined ? process.env.UPSTASH_REDIS_REST_URL : options.url;
+  const token = options.token === undefined ? process.env.UPSTASH_REDIS_REST_TOKEN : options.token;
+  if (!url || !token) return rateLimit(req, res, key, maxRequests, windowMs);
+
+  const forwarded = String(req.headers?.["x-forwarded-for"] || "").split(",")[0].trim();
+  const ip = forwarded || req.socket?.remoteAddress || "unknown";
+  const digest = crypto.createHash("sha256").update(key + ":" + ip).digest("hex");
+  const redisKey = "leetmetric:rate-limit:" + digest;
+  const fetchImpl = options.fetchImpl || fetch;
+
+  try {
+    const response = await fetchImpl(url, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + token,
+        "Content-Type": "application/json",
+        Accept: "application/json"
+      },
+      body: JSON.stringify(["EVAL", DISTRIBUTED_LIMIT_SCRIPT, "1", redisKey, String(windowMs)]),
+      signal: AbortSignal.timeout(options.timeoutMs || 2000)
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok || payload.error) throw new Error("Distributed rate limiter request failed.");
+    const result = payload.result;
+    if (!Array.isArray(result) || result.length < 2) {
+      throw new Error("Distributed rate limiter returned an invalid result.");
+    }
+    const count = Number(result[0]);
+    const ttlMs = Number(result[1]);
+    if (!Number.isSafeInteger(count) || count < 1 || !Number.isFinite(ttlMs)) {
+      throw new Error("Distributed rate limiter returned invalid counters.");
+    }
+    if (count > maxRequests) {
+      res.setHeader("Retry-After", String(Math.max(1, Math.ceil(Math.max(0, ttlMs) / 1000))));
+      json(res, 429, { error: "Too many attempts. Please wait a little and try again." });
+      return false;
+    }
+    return true;
+  } catch (error) {
+    // Fail open to the bounded process-local limiter so a Redis outage does not
+    // lock users out. This fallback is per function instance, not globally shared.
+    console.warn("distributed_rate_limit_fallback", error && error.name ? error.name : "UnknownError");
+    return rateLimit(req, res, key, maxRequests, windowMs);
+  }
+}
+
 async function getSessionUser(req) {
   const token = cookies(req)[COOKIE_NAME];
   if (!token) return null;
@@ -141,5 +197,5 @@ function isValidEmail(email) {
 
 module.exports = {
   json, requireSecret, setSessionCookie, clearSessionCookie, enforceSameOrigin,
-  isSameOrigin, rateLimit, getSessionUser, publicUser, methodNotAllowed, isValidEmail
+  isSameOrigin, rateLimit, rateLimitShared, getSessionUser, publicUser, methodNotAllowed, isValidEmail
 };

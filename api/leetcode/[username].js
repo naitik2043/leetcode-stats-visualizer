@@ -143,7 +143,7 @@ module.exports = async function handler(req, res) {
     return res.status(200).json(responseProfile(data, fresh.metadata, "fresh"));
   } catch (error) {
     const fallback = readCache(cacheKey);
-    const isTransient = error.name === "TimeoutError" || error.name === "AbortError" ||
+    const isTransient = error.name === "TimeoutError" || error.name === "AbortError" || error instanceof TypeError ||
       error.code === "LEETCODE_UPSTREAM_STATUS" || error.code === "LEETCODE_UPSTREAM_PAYLOAD";
     if (fallback && isTransient) {
       res.setHeader("X-LeetMetric-Data-State", "stale-if-error");

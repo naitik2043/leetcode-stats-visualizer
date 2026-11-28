@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { enforceSameOrigin, isSameOrigin, rateLimit, publicUser } = require("./auth");
+const { enforceSameOrigin, isSameOrigin, rateLimit, rateLimitShared, publicUser } = require("./auth");
 
 function responseRecorder() {
   return {
@@ -81,4 +81,69 @@ test("public session payload never exposes authentication secrets", () => {
     leetcodeUsername: "developer",
     createdAt
   });
+});
+
+
+test("uses the shared Upstash limiter and sends a hashed bucket key", async () => {
+  let command = null;
+  const fetchImpl = async (_url, options) => {
+    command = JSON.parse(options.body);
+    return { ok: true, async json() { return { result: [1, 60000] }; } };
+  };
+  const res = responseRecorder();
+  const allowed = await rateLimitShared(
+    { headers: { "x-forwarded-for": "203.0.113.45" } },
+    res,
+    "login-test",
+    4,
+    60000,
+    { url: "https://redis.example", token: "test-token", fetchImpl }
+  );
+  assert.equal(allowed, true);
+  assert.equal(command[0], "EVAL");
+  assert.equal(command[2], "1");
+  assert.match(command[3], /^leetmetric:rate-limit:[a-f0-9]{64}$/);
+  assert.equal(command[3].includes("203.0.113.45"), false);
+  assert.equal(command[4], "60000");
+});
+
+test("blocks a request when the shared limiter count exceeds the configured threshold", async () => {
+  const fetchImpl = async () => ({
+    ok: true,
+    async json() { return { result: [6, 3500] }; }
+  });
+  const res = responseRecorder();
+  const allowed = await rateLimitShared(
+    { headers: { "x-forwarded-for": "203.0.113.46" } },
+    res,
+    "shared-limit-test",
+    5,
+    60000,
+    { url: "https://redis.example", token: "test-token", fetchImpl }
+  );
+  assert.equal(allowed, false);
+  assert.equal(res.statusCode, 429);
+  assert.equal(res.headers["Retry-After"], "4");
+});
+
+test("falls back to the bounded process-local limiter if Upstash is unavailable", async () => {
+  const fetchImpl = async () => { throw new TypeError("network unavailable"); };
+  const req = { headers: { "x-forwarded-for": "203.0.113.47" } };
+  const first = responseRecorder();
+  const second = responseRecorder();
+  assert.equal(await rateLimitShared(req, first, "fallback-test", 1, 60000, {
+    url: "https://redis.example", token: "test-token", fetchImpl
+  }), true);
+  assert.equal(await rateLimitShared(req, second, "fallback-test", 1, 60000, {
+    url: "https://redis.example", token: "test-token", fetchImpl
+  }), false);
+  assert.equal(second.statusCode, 429);
+});
+
+test("uses the local limiter when distributed rate-limit credentials are not configured", async () => {
+  const req = { headers: { "x-forwarded-for": "203.0.113.48" } };
+  const res = responseRecorder();
+  assert.equal(await rateLimitShared(req, res, "local-env-test", 2, 60000, {
+    url: "", token: ""
+  }), true);
 });

@@ -1,12 +1,12 @@
 const bcrypt = require("bcryptjs");
 const connectToDatabase = require("../../server/db");
 const User = require("../../server/models/User");
-const { json, requireSecret, setSessionCookie, enforceSameOrigin, rateLimit, methodNotAllowed, isValidEmail, publicUser } = require("../../server/auth");
+const { json, requireSecret, setSessionCookie, enforceSameOrigin, rateLimitShared, methodNotAllowed, isValidEmail, publicUser } = require("../../server/auth");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") return methodNotAllowed(req, res, "POST");
   if (!enforceSameOrigin(req, res)) return;
-  if (!rateLimit(req, res, "signup", 5)) return;
+  if (!await rateLimitShared(req, res, "signup", 5)) return;
 
   const { name, email, password } = req.body || {};
   const cleanName = typeof name === "string" ? name.trim() : "";

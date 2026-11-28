@@ -2,12 +2,12 @@ const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const connectToDatabase = require("../../server/db");
 const User = require("../../server/models/User");
-const { json, enforceSameOrigin, rateLimit, methodNotAllowed } = require("../../server/auth");
+const { json, enforceSameOrigin, rateLimitShared, methodNotAllowed } = require("../../server/auth");
 
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") return methodNotAllowed(req, res, "POST");
   if (!enforceSameOrigin(req, res)) return;
-  if (!rateLimit(req, res, "reset-password", 5)) return;
+  if (!await rateLimitShared(req, res, "reset-password", 5)) return;
 
   const token = typeof req.body?.token === "string" ? req.body.token.trim() : "";
   const password = typeof req.body?.password === "string" ? req.body.password : "";
