@@ -80,7 +80,8 @@ This roadmap is the source of truth for shipped and planned work. A capability i
 - [ ] Expand browser coverage to authenticated dashboard flows, account export and roadmap cloud-sync conflict handling.
 - [ ] Add automated WCAG accessibility scans and visual regression coverage.
 - [x] Add a no-store database health endpoint and structured, allowlisted operational events that exclude account data and secrets.
-- [ ] Add scheduled uptime checks, alert delivery and operational dashboards.
+- [x] Add an hourly, opt-in GitHub Actions health monitor with optional webhook alerts.
+- [ ] Add broader operational dashboards, historical latency/error metrics and alert acknowledgement workflows.
 - [x] Add optional Upstash Redis-backed distributed rate limiting for state-changing APIs, with an in-memory fallback when unconfigured or unavailable.
 - [ ] Add shared Redis profile-cache storage before scaling, with cache invalidation and explicit TTL controls.
 

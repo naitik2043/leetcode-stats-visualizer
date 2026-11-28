@@ -1,0 +1,59 @@
+name: Uptime health monitor
+
+on:
+  schedule:
+    - cron: "23 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: leetmetric-uptime-monitor
+  cancel-in-progress: false
+
+jobs:
+  health:
+    name: Check production health
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Check health endpoint
+        env:
+          HEALTHCHECK_URL: ${{ secrets.LEETMETRIC_HEALTHCHECK_URL }}
+          ALERT_WEBHOOK_URL: ${{ secrets.OPS_ALERT_WEBHOOK_URL }}
+        shell: bash
+        run: |
+          if [[ -z "$HEALTHCHECK_URL" ]]; then
+            echo "::notice::Uptime monitoring is not activated. Add LEETMETRIC_HEALTHCHECK_URL after the health endpoint has been deployed."
+            exit 0
+          fi
+
+          if [[ "$HEALTHCHECK_URL" != https://*/api/health ]]; then
+            echo "::error::LEETMETRIC_HEALTHCHECK_URL must be an HTTPS URL ending in /api/health."
+            exit 1
+          fi
+
+          response_file="$(mktemp)"
+          trap 'rm -f "$response_file"' EXIT
+          http_status="$(curl --silent --show-error --location --max-time 15 \
+            --retry 2 --retry-all-errors --retry-delay 5 \
+            --output "$response_file" --write-out "%{http_code}" \
+            "$HEALTHCHECK_URL" 2>/dev/null || echo "000")"
+
+          service_status="$(jq -r '.status // "unknown"' "$response_file" 2>/dev/null || echo "unknown")"
+          database_status="$(jq -r '.checks.database // "unknown"' "$response_file" 2>/dev/null || echo "unknown")"
+
+          if [[ "$http_status" != "200" || "$service_status" != "ok" || "$database_status" != "ok" ]]; then
+            echo "::error::LeetMetric health check failed (HTTP ${http_status}, service=${service_status}, database=${database_status})."
+            if [[ -n "$ALERT_WEBHOOK_URL" ]]; then
+              message="LeetMetric health check failed: HTTP ${http_status}, service=${service_status}, database=${database_status}. Check the GitHub Actions run for details."
+              payload="$(jq -n --arg text "$message" '{text: $text}')"
+              curl --silent --show-error --max-time 10 \
+                -H "Content-Type: application/json" \
+                --data "$payload" "$ALERT_WEBHOOK_URL" >/dev/null || true
+            fi
+            exit 1
+          fi
+
+          echo "LeetMetric is healthy. Database ping completed successfully."

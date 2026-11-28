@@ -28,6 +28,9 @@ function sampleProfile(cacheState = "fresh") {
 }
 
 test("homepage navigation and light/dark theme preference work", async ({ page }) => {
+  await page.addInitScript(() => {
+    try { localStorage.setItem("leetmetric-theme", "dark"); } catch { /* Isolate the test from the machine theme. */ }
+  });
   await page.goto("/");
   await expect(page).toHaveTitle(/LeetMetric/);
   await expect(page.getByRole("main")).toBeVisible();
