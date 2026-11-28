@@ -70,10 +70,20 @@ async function loadCodeforces(username, fetchImpl = fetch) {
   const url = new URL("https://codeforces.com/api/user.info");
   url.searchParams.set("handles", username);
   const payload = await requestCodeforces(url.toString(), fetchImpl);
+  if (payload && payload.status === "FAILED") {
+    const comment = String(payload.comment || "Codeforces could not find this public profile.");
+    if (/call limit exceeded|rate limit|too many requests/i.test(comment)) {
+      throw new PlatformError("Codeforces request limit reached. Try again in a moment.", 429, "UPSTREAM_RATE_LIMIT");
+    }
+    if (/not found|no such user|invalid handle/i.test(comment)) {
+      throw new PlatformError("That Codeforces public profile was not found.", 404, "PROFILE_NOT_FOUND");
+    }
+    throw new PlatformError("Codeforces could not complete the profile request.", 502, "UPSTREAM_ERROR");
+  }
   try {
     return normalizeCodeforces(payload);
   } catch (error) {
-    throw new PlatformError(error.message || "Codeforces profile not found.", 404, "PROFILE_NOT_FOUND");
+    throw new PlatformError(error.message || "Codeforces returned an invalid profile response.", 502, "UPSTREAM_PAYLOAD");
   }
 }
 

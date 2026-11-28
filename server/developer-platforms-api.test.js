@@ -32,6 +32,16 @@ test("loads Codeforces public profile through the documented user.info endpoint"
   assert.match(requestedUrl, /^https:\/\/codeforces\.com\/api\/user\.info\?/);
 });
 
+test("maps Codeforces API rate-limit and missing-handle responses accurately", async () => {
+  clearDeveloperProfileCache();
+  const rateLimited = async () => fakeResponse({ status: "FAILED", comment: "Call limit exceeded" });
+  await assert.rejects(loadCodeforces("handle1", rateLimited), (error) => error.status === 429);
+
+  clearDeveloperProfileCache();
+  const missing = async () => fakeResponse({ status: "FAILED", comment: "handles: Not found: unknown" });
+  await assert.rejects(loadCodeforces("unknown", missing), (error) => error.status === 404);
+});
+
 test("loads GitHub public profile and a bounded owner repository sample", async () => {
   clearDeveloperProfileCache();
   const urls = [];
