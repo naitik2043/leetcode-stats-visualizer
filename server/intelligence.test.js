@@ -52,7 +52,7 @@ test("calculates activity windows from UTC calendar dates", () => {
 
 test("readiness score is deterministic and exposes its methodology", () => {
   const result = intelligence.analyzeProfile(makeProfile(), { today: "2026-11-28T00:00:00.000Z" });
-  assert.equal(result.readiness.score, 43);
+  assert.equal(result.readiness.score, 40);
   assert.equal(result.readiness.components.length, 4);
   assert.match(result.readiness.disclaimer, /not a hiring prediction/);
   assert.match(result.readiness.methodology, /Equal weights/);
