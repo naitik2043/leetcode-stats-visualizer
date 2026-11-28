@@ -213,6 +213,7 @@ async function handleAccountDeletion(req, res) {
 async function handleAccountExport(req, res) {
   if (req.method !== "GET") return methodNotAllowed(req, res, "GET");
   if (!enforceSameOrigin(req, res)) return;
+  if (!await rateLimitShared(req, res, "account-export", 3, 60 * 60 * 1000)) return;
 
   try {
     await connectToDatabase();
@@ -750,6 +751,7 @@ async function handleRoadmaps(req, res) {
 async function handleRoadmapItem(req, res, id) {
   if (req.method !== "PATCH" && req.method !== "DELETE") return methodNotAllowed(req, res, "PATCH, DELETE");
   if (!enforceSameOrigin(req, res)) return;
+  if (!await rateLimitShared(req, res, "roadmap-item-write", 60, 60 * 60 * 1000)) return;
   if (!mongoose.isValidObjectId(id)) return json(res, 400, { error: "Invalid roadmap identifier." });
 
   try {
