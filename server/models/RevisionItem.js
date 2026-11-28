@@ -8,6 +8,8 @@ const revisionItemSchema = new mongoose.Schema({
   problemUrl: { type: String, trim: true, maxlength: 250, default: "" },
   difficulty: { type: String, required: true, enum: ["Easy", "Medium", "Hard"] },
   topic: { type: String, trim: true, maxlength: 60, default: "" },
+  attemptsBeforeAccepted: { type: Number, min: 1, max: 100, default: null },
+  timeSpentMinutes: { type: Number, min: 1, max: 600, default: null },
   mistakeType: {
     type: String,
     enum: ["pattern-recognition", "edge-cases", "complexity", "implementation", "recall", "other"],

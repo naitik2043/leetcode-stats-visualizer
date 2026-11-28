@@ -380,6 +380,14 @@
             <input id="revision-topic" name="topic" type="text" maxlength="60" placeholder="e.g. Sliding Window">
           </div>
           <div class="revision-field">
+            <label for="revision-attempts">ATTEMPTS UNTIL ACCEPTED (OPTIONAL)</label>
+            <input id="revision-attempts" name="attemptsBeforeAccepted" type="number" min="1" max="100" step="1" inputmode="numeric" placeholder="e.g. 3">
+          </div>
+          <div class="revision-field">
+            <label for="revision-time">TIME SPENT · MINUTES (OPTIONAL)</label>
+            <input id="revision-time" name="timeSpentMinutes" type="number" min="1" max="600" step="1" inputmode="numeric" placeholder="e.g. 20">
+          </div>
+          <div class="revision-field">
             <label for="revision-mistake">WHY REVISIT?</label>
             <select id="revision-mistake" name="mistakeType">
               <option value="pattern-recognition">Could not identify pattern</option>
@@ -404,7 +412,7 @@
         <div id="revision-list" class="revision-list">
           <p class="workspace-empty-state">Sign in and save a preferred profile to start your private revision queue.</p>
         </div>
-        <p class="workspace-card-footnote">LeetMetric stores the title, optional LeetCode problem link, topic, difficulty, revision category and notes you enter. It does not read your LeetCode private submissions or source code.</p>
+        <p class="workspace-card-footnote">LeetMetric stores the title, optional LeetCode problem link, topic, difficulty, revision category, notes, and optional attempts/time values you record yourself. These are not inferred from LeetCode private submissions or source code.</p>
       </article>
     </section>
 

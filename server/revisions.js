@@ -27,11 +27,22 @@ function normalizeProblemUrl(value) {
   return "https://leetcode.com" + url.pathname.replace(/\/$/, "") + "/";
 }
 
+function normalizeOptionalInteger(value, label, minimum, maximum) {
+  if (value === undefined || value === null || value === "") return null;
+  const parsed = Number(value);
+  if (!Number.isSafeInteger(parsed) || parsed < minimum || parsed > maximum) {
+    throw invalid(label + " must be a whole number between " + minimum + " and " + maximum + ", or left blank.");
+  }
+  return parsed;
+}
+
 function normalizeRevisionCreate(body = {}) {
   const title = typeof body.title === "string" ? body.title.trim() : "";
   const difficulty = typeof body.difficulty === "string" ? body.difficulty : "";
   const topic = typeof body.topic === "string" ? body.topic.trim() : "";
   const mistakeType = typeof body.mistakeType === "string" ? body.mistakeType : "other";
+  const attemptsBeforeAccepted = normalizeOptionalInteger(body.attemptsBeforeAccepted, "Attempts before accepted", 1, 100);
+  const timeSpentMinutes = normalizeOptionalInteger(body.timeSpentMinutes, "Time spent", 1, 600);
   const notes = typeof body.notes === "string" ? body.notes.trim() : "";
 
   if (title.length < 2 || title.length > 120) throw invalid("Problem title must be between 2 and 120 characters.");
@@ -46,6 +57,8 @@ function normalizeRevisionCreate(body = {}) {
     difficulty,
     topic,
     mistakeType,
+    attemptsBeforeAccepted,
+    timeSpentMinutes,
     notes
   };
 }
@@ -66,6 +79,12 @@ function normalizeRevisionUpdate(body = {}) {
     const topic = typeof body.topic === "string" ? body.topic.trim() : "";
     if (topic.length > 60) throw invalid("Topic must be 60 characters or fewer.");
     update.topic = topic;
+  }
+  if (Object.prototype.hasOwnProperty.call(body, "attemptsBeforeAccepted")) {
+    update.attemptsBeforeAccepted = normalizeOptionalInteger(body.attemptsBeforeAccepted, "Attempts before accepted", 1, 100);
+  }
+  if (Object.prototype.hasOwnProperty.call(body, "timeSpentMinutes")) {
+    update.timeSpentMinutes = normalizeOptionalInteger(body.timeSpentMinutes, "Time spent", 1, 600);
   }
   if (Object.prototype.hasOwnProperty.call(body, "mistakeType")) {
     if (!MISTAKE_TYPES.has(body.mistakeType)) throw invalid("Choose a valid revision category.");

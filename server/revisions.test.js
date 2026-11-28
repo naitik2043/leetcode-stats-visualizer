@@ -44,3 +44,31 @@ test("marks mastered revisions with a review timestamp", () => {
   assert.equal(update.status, "mastered");
   assert.ok(update.reviewedAt instanceof Date);
 });
+
+test("normalizes optional user-recorded attempts and time spent", () => {
+  const item = normalizeRevisionCreate({
+    title: "Coin Change",
+    difficulty: "Medium",
+    attemptsBeforeAccepted: "3",
+    timeSpentMinutes: "24"
+  });
+  assert.equal(item.attemptsBeforeAccepted, 3);
+  assert.equal(item.timeSpentMinutes, 24);
+});
+
+test("rejects invalid attempt and duration values on create or update", () => {
+  assert.throws(() => normalizeRevisionCreate({
+    title: "Bad attempts", difficulty: "Easy", attemptsBeforeAccepted: "0"
+  }), { code: "INVALID_REVISION" });
+  assert.throws(() => normalizeRevisionCreate({
+    title: "Too long", difficulty: "Hard", timeSpentMinutes: "601"
+  }), { code: "INVALID_REVISION" });
+  assert.throws(() => normalizeRevisionUpdate({ attemptsBeforeAccepted: "1.5" }), { code: "INVALID_REVISION" });
+  assert.throws(() => normalizeRevisionUpdate({ timeSpentMinutes: "-1" }), { code: "INVALID_REVISION" });
+});
+
+test("allows clearing previously recorded attempt and time fields", () => {
+  const update = normalizeRevisionUpdate({ attemptsBeforeAccepted: "", timeSpentMinutes: null });
+  assert.equal(update.attemptsBeforeAccepted, null);
+  assert.equal(update.timeSpentMinutes, null);
+});

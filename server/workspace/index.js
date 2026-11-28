@@ -401,6 +401,8 @@ function revisionPayload(item) {
     difficulty: item.difficulty,
     topic: item.topic || "",
     mistakeType: item.mistakeType,
+    attemptsBeforeAccepted: item.attemptsBeforeAccepted ?? null,
+    timeSpentMinutes: item.timeSpentMinutes ?? null,
     notes: item.notes || "",
     status: item.status,
     reviewedAt: item.reviewedAt || null,
