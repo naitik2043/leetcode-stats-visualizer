@@ -183,10 +183,9 @@ Never commit .env, MongoDB credentials, API keys or production secrets.
 
 | Method | Endpoint | Purpose |
 |---|---|---|
+| GET | /api/health | No-store application/database health check |
 | GET | /api/leetcode/:username | Public LeetCode profile analytics |
 | GET | /api/developer/:platform/:username | Public Codeforces or GitHub profile overview |
-
-The Developer Profile page calls a same-origin serverless adapter that retrieves public data from the official Codeforces API and GitHub REST API. The adapter allowlists providers, validates handles, applies timeouts, caches responses and isolates platform errors. No platform API secrets are required or stored by LeetMetric.
 | POST | /api/auth/signup | Create account |
 | POST | /api/auth/login | Start a session |
 | POST | /api/auth/logout | End a session |
@@ -206,6 +205,8 @@ The Developer Profile page calls a same-origin serverless adapter that retrieves
 | POST | /api/integrations/paste | Create a one-time Paste Vault launch URL |
 | POST | /api/contact | Store a validated contact request |
 
+The Developer Profile page calls a same-origin serverless adapter that retrieves public data from the official Codeforces API and GitHub REST API. The adapter allowlists providers, validates handles, applies timeouts, caches responses and isolates platform errors. No platform API secrets are required or stored by LeetMetric.
+
 The intelligence, roadmap, code review, readiness and report calculations currently run in the browser; they do not require an AI API key.
 
 ## Quality checks
@@ -223,13 +224,13 @@ npx playwright install chromium
 npm run test:e2e
 ~~~
 
-The command performs JavaScript syntax checks and runs Node's built-in test suite. GitHub Actions runs these checks on pushes to main and feature branches and on pull requests targeting main. The workflow installs Chromium and runs the Playwright smoke suite after the deterministic checks. The E2E tests mock public/API responses and do not require production credentials or a database.
+The command performs JavaScript syntax checks, static HTML/asset contract checks and runs Node's built-in unit test suite. GitHub Actions runs these checks on pushes to main and feature branches and on pull requests targeting main. The workflow installs Chromium and runs the Playwright smoke suite after the deterministic checks. The E2E tests mock public/API responses and do not require production credentials or a database.
 
 Before production growth, add database-backed integration tests, broader authenticated end-to-end coverage, automated accessibility scans and visual regression checks. An hourly GitHub Actions uptime monitor is included; set the `LEETMETRIC_HEALTHCHECK_URL` Actions secret after the health endpoint is deployed. Optionally set `OPS_ALERT_WEBHOOK_URL` to receive failure notifications. The current browser suite is a focused smoke suite rather than full user-journey coverage. Without Upstash credentials, rate limiting uses a bounded in-memory fallback scoped to each serverless instance. When both UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are configured, state-changing API limits use an atomic Redis Lua script shared across instances. If Redis is temporarily unavailable, the application logs a sanitized fallback event and uses its local limiter; that degraded mode is not globally distributed.
 
 ## Roadmap
 
-The maintained implementation roadmap lives in docs/PRODUCT-ROADMAP.md. Remaining planned items include end-to-end browser/accessibility tests, richer operations monitoring, an optional server-side AI study coach, isolated code execution, additional platform integrations and any future frontend migration. These are not represented as shipped features.
+The maintained implementation roadmap lives in docs/PRODUCT-ROADMAP.md. Remaining planned items include broader authenticated browser journeys, automated accessibility/visual regression coverage, richer operations dashboards, an optional server-side AI study coach, isolated code execution, additional platform integrations and any future frontend migration. These are not represented as shipped features.
 
 ## Security and privacy
 
