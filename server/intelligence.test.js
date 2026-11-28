@@ -93,3 +93,31 @@ test("missing topics and activity produce cautious recommendations", () => {
   assert.ok(result.recommendations.some((item) => /Collect more topic data/.test(item.title)));
   assert.ok(result.dataNotes.some((item) => /No public activity calendar/.test(item)));
 });
+
+test("predicts the next 100-problem milestone only with seven days of positive history", () => {
+  const result = intelligence.predictProgress([
+    { dateKey: "2026-11-01", totalSolved: 90 },
+    { dateKey: "2026-11-15", totalSolved: 104 }
+  ]);
+  assert.equal(result.available, true);
+  assert.equal(result.elapsedDays, 14);
+  assert.equal(result.solvedGrowth, 14);
+  assert.equal(result.nextMilestone, 200);
+  assert.equal(result.averageSolvedPerDay, 1);
+  assert.equal(result.projectedDate, "2027-02-19");
+});
+
+test("withholds progress projections when history is short or has no net growth", () => {
+  const short = intelligence.predictProgress([
+    { dateKey: "2026-11-01", totalSolved: 100 },
+    { dateKey: "2026-11-05", totalSolved: 105 }
+  ]);
+  const stagnant = intelligence.predictProgress([
+    { dateKey: "2026-10-01", totalSolved: 100 },
+    { dateKey: "2026-11-01", totalSolved: 100 }
+  ]);
+  assert.equal(short.available, false);
+  assert.match(short.reason, /at least 7 days/);
+  assert.equal(stagnant.available, false);
+  assert.match(stagnant.reason, /positive net growth/);
+});

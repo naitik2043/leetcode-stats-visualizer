@@ -193,6 +193,52 @@
     };
   }
 
+  function predictProgress(snapshots) {
+    if (!Array.isArray(snapshots) || snapshots.length < 2) {
+      return { available: false, reason: "Save at least two daily snapshots to estimate your recent pace." };
+    }
+    const normalized = snapshots.map((item) => {
+      const dateKey = String(item && item.dateKey || "");
+      const totalSolved = Number(item && item.totalSolved);
+      if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(dateKey) || !Number.isSafeInteger(totalSolved) || totalSolved < 0) return null;
+      const timestamp = Date.parse(dateKey + "T00:00:00.000Z");
+      return Number.isFinite(timestamp) ? { dateKey, timestamp, totalSolved } : null;
+    }).filter(Boolean).sort((a, b) => a.timestamp - b.timestamp);
+
+    if (normalized.length < 2) {
+      return { available: false, reason: "The saved history does not contain enough valid daily snapshots." };
+    }
+    const first = normalized[0];
+    const last = normalized[normalized.length - 1];
+    const elapsedDays = Math.floor((last.timestamp - first.timestamp) / 86400000);
+    const solvedGrowth = last.totalSolved - first.totalSolved;
+    if (elapsedDays < 7) {
+      return { available: false, reason: "Save snapshots across at least 7 days to reduce noise in the pace estimate." };
+    }
+    if (solvedGrowth <= 0) {
+      return { available: false, reason: "Your saved snapshots do not show positive net growth yet; keep recording progress before estimating a milestone date." };
+    }
+
+    const averageSolvedPerDay = solvedGrowth / elapsedDays;
+    const nextMilestone = (Math.floor(last.totalSolved / 100) + 1) * 100;
+    const daysToMilestone = Math.ceil((nextMilestone - last.totalSolved) / averageSolvedPerDay);
+    const projectedDate = new Date(last.timestamp + daysToMilestone * 86400000);
+    return {
+      available: true,
+      baselineDate: first.dateKey,
+      latestDate: last.dateKey,
+      baselineSolved: first.totalSolved,
+      currentSolved: last.totalSolved,
+      solvedGrowth,
+      elapsedDays,
+      averageSolvedPerDay: round(averageSolvedPerDay),
+      nextMilestone,
+      daysToMilestone,
+      projectedDate: utcDateKey(projectedDate),
+      methodology: "Linear estimate from net solved-count change across the first and latest valid saved snapshots. Assumes the same average pace continues; it is not a promise or a prediction of interview success."
+    };
+  }
+
   function createRoadmap(rawProfile, options) {
     const insights = analyzeProfile(rawProfile, options);
     const profile = normalizeProfile(rawProfile);
@@ -240,6 +286,7 @@
     createRoadmap,
     summarizeMistakes,
     activityWindow,
-    normalizeProfile
+    normalizeProfile,
+    predictProgress
   };
 });

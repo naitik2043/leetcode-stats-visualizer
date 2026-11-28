@@ -51,7 +51,11 @@
       ["Practice", "Active days last 30", payload.insights.activity.last30.activeDays],
       ["Practice", "Current streak", payload.insights.activity.currentStreak],
       ["History", "Snapshot count", payload.history.snapshots.length],
-      ["History", "Solved change", payload.history.solvedChange]
+      ["History", "Solved change", payload.history.solvedChange],
+      ["Projection", "Available", payload.history.prediction.available],
+      ["Projection", "Average solved per day", payload.history.prediction.averageSolvedPerDay || ""],
+      ["Projection", "Next milestone", payload.history.prediction.nextMilestone || ""],
+      ["Projection", "Projected milestone date", payload.history.prediction.projectedDate || payload.history.prediction.reason]
     ];
     payload.insights.topics.lowerCoverageCandidates.forEach((topic) => rows.push(["Topic candidate", topic.name, topic.solved]));
     payload.history.snapshots.forEach((snapshot) => rows.push(["Snapshot", snapshot.dateKey, snapshot.totalSolved]));
@@ -93,6 +97,24 @@
       });
     }
 
+    const projection = document.getElementById("report-projection");
+    projection.replaceChildren();
+    if (payload.history.prediction.available) {
+      const prediction = payload.history.prediction;
+      [
+        ["Recent pace", prediction.averageSolvedPerDay + " solved / day"],
+        ["Net growth", "+" + prediction.solvedGrowth + " in " + prediction.elapsedDays + " days"],
+        ["Next milestone", prediction.nextMilestone.toLocaleString() + " solved"],
+        ["Estimated date", prediction.projectedDate]
+      ].forEach(([label, value]) => {
+        const row = el("div", "report-data-row");
+        row.append(el("span", "", label), el("strong", "", value));
+        projection.append(row);
+      });
+    } else {
+      projection.append(el("p", "report-muted", payload.history.prediction.reason));
+    }
+
     const topics = document.getElementById("report-topics");
     topics.replaceChildren();
     if (!payload.insights.topics.lowerCoverageCandidates.length) {
@@ -127,14 +149,16 @@
     } catch {
       historyUnavailable = true;
     }
-    const solvedChange = snapshots.length > 1
-      ? Number(snapshots[snapshots.length - 1].totalSolved) - Number(snapshots[0].totalSolved)
+    const orderedSnapshots = snapshots.slice().sort((a, b) => String(a.dateKey).localeCompare(String(b.dateKey)));
+    const solvedChange = orderedSnapshots.length > 1
+      ? Number(orderedSnapshots[orderedSnapshots.length - 1].totalSolved) - Number(orderedSnapshots[0].totalSolved)
       : 0;
+    const prediction = window.LeetMetricIntelligence.predictProgress(orderedSnapshots);
     return {
       generatedAt: new Date().toISOString(),
       profile,
       insights,
-      history: { snapshots, solvedChange, unavailable: historyUnavailable }
+      history: { snapshots: orderedSnapshots, solvedChange, prediction, unavailable: historyUnavailable }
     };
   }
 
