@@ -117,6 +117,35 @@ Browser
 
 The Code Review Lab does not execute user code. The shared intelligence engine is dependency-free and can be tested in Node.js while also being loaded by browser pages.
 
+## Repository structure
+
+The repository separates public pages, browser assets, serverless handlers, backend services, tests and project documentation:
+
+```text
+.
+├── pages/                 # Public HTML pages (19 routes)
+├── assets/
+│   ├── css/               # Shared and page-specific stylesheets
+│   ├── js/                # Browser JavaScript modules
+│   └── images/             # Favicon and preview artwork
+├── api/                   # Vercel serverless route handlers
+├── server/
+│   ├── models/             # Mongoose schemas
+│   └── workspace/          # Authenticated workspace route logic
+├── tests/
+│   ├── contracts/          # HTML and asset contract checks
+│   ├── e2e/                 # Playwright browser journeys
+│   └── unit/                # Node.js unit tests
+├── scripts/                # Local test tooling
+├── docs/                   # Product roadmap and technical notes
+├── .github/workflows/      # CI and opt-in uptime monitor
+├── package.json
+├── playwright.config.js
+└── vercel.json              # Public page and API route rewrites
+```
+
+The public URLs remain unchanged (for example, `/dashboard.html` and `/roadmap.html`). Vercel rewrites those paths to the HTML files under `pages/`; asset URLs are served from `/assets/`. This keeps existing links, sitemap entries and browser navigation stable while the source tree stays organized.
+
 ## Technology
 
 | Layer | Technology |

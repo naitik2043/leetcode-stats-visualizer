@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d18">
+  <meta name="description" content="Generate a practical LeetCode roadmap based on your available profile topic coverage and difficulty mix.">
+  <script src="/assets/js/theme-init.js"></script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Personalized DSA Roadmap | LeetMetric</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/site.css"><link rel="stylesheet" href="/assets/css/roadmap-page.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <main class="page-main roadmap-page">
+    <section class="page-hero">
+      <div class="page-kicker">PERSONALIZED PRACTICE</div>
+      <h1 class="page-title">A roadmap built around<br><span style="color:var(--page-accent)">your next milestone.</span></h1>
+      <p class="page-lead">Generate a 7-day, 30-day or 90-day practice outline from your public profile. Review the suggested focus areas, adjust the targets and track completion locally or synchronize saved plans to your LeetMetric account.</p>
+      <form id="roadmap-form" class="roadmap-form" novalidate>
+        <div class="form-field"><label for="roadmap-username">LEETCODE USERNAME</label><input id="roadmap-username" name="username" maxlength="30" autocomplete="off" placeholder="e.g. Naitik_Gupta" required></div>
+        <div class="form-field"><label for="roadmap-horizon">PLAN DURATION</label><select id="roadmap-horizon" name="horizonDays"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option></select></div>
+        <button id="roadmap-submit" class="primary-button" type="submit">Generate roadmap →</button>
+      </form>
+      <p id="roadmap-status" class="roadmap-status" role="status" aria-live="polite">Choose your profile and plan duration to begin.</p>
+    </section>
+
+    <section id="roadmap-results" hidden>
+      <div class="roadmap-summary">
+        <div><div class="page-kicker">YOUR PRACTICE PLAN</div><h2 id="roadmap-title">Personalized roadmap</h2><p id="roadmap-description"></p></div>
+        <div class="roadmap-summary-stat"><strong id="roadmap-target">—</strong><span>suggested problem target</span></div>
+      </div>
+      <div class="roadmap-toolbar">
+        <span id="roadmap-progress">0 completed</span>
+        <div class="roadmap-toolbar-controls"><select id="roadmap-saved-plans" aria-label="Saved roadmaps"><option value="">Saved plans (sign in to sync)</option></select><button id="roadmap-load-saved" type="button">Load selected</button><button id="roadmap-delete-saved" type="button">Delete selected</button><button id="roadmap-save" type="button">Save to account</button><button id="roadmap-export" type="button">Export plan</button></div>
+      </div>
+      <div id="roadmap-weeks" class="roadmap-weeks"></div>
+      <p class="roadmap-footnote">This is an editable planning aid, not an automatically assigned LeetCode problem list. Public topic counts are directional signals and can overlap across tags. Local progress is always available. Sign in and save your preferred LeetCode username to synchronize plans and completion across devices.</p>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="/assets/js/data-freshness.js"></script>
+  <script src="/assets/js/intelligence-engine.js"></script>
+  <script src="/assets/js/roadmap-page.js" defer></script>
+  <script src="/assets/js/site.js" defer></script>
+</body>
+</html>

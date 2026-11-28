@@ -4,6 +4,15 @@ const path = require("node:path");
 
 const ROOT = path.resolve(__dirname, "..");
 const PORT = Number(process.env.PORT) || 4173;
+const PAGE_ROOT = path.join(ROOT, "pages");
+const PAGE_FILES = new Set(
+  fs.readdirSync(PAGE_ROOT).filter((name) => name.endsWith(".html"))
+);
+const ROUTE_ALIASES = new Map([
+  ["/", "/pages/index.html"],
+  ["/favicon.svg", "/assets/images/favicon.svg"],
+  ["/preview.png", "/assets/images/preview.png"]
+]);
 const MIME_TYPES = {
   ".html": "text/html; charset=utf-8",
   ".css": "text/css; charset=utf-8",
@@ -14,8 +23,17 @@ const MIME_TYPES = {
   ".ico": "image/x-icon",
   ".xml": "application/xml; charset=utf-8",
   ".txt": "text/plain; charset=utf-8",
-  ".md": "text/markdown; charset=utf-8"
+  ".md": "text/markdown"
 };
+
+function resolveRequestPath(pathname) {
+  const alias = ROUTE_ALIASES.get(pathname);
+  if (alias) return alias;
+  if (PAGE_FILES.has(path.basename(pathname)) && pathname === "/" + path.basename(pathname)) {
+    return "/pages/" + path.basename(pathname);
+  }
+  return pathname;
+}
 
 const server = http.createServer(async (req, res) => {
   if (req.method !== "GET" && req.method !== "HEAD") {
@@ -30,8 +48,9 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(400, { "Cache-Control": "no-store" });
     return res.end("Invalid request path");
   }
-  if (pathname === "/") pathname = "/index.html";
+
   if (pathname.endsWith("/")) pathname += "index.html";
+  pathname = resolveRequestPath(pathname);
 
   const filename = path.resolve(ROOT, "." + pathname);
   if (filename !== ROOT && !filename.startsWith(ROOT + path.sep)) {

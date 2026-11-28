@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d18">
+  <meta name="description" content="Build a public developer profile by viewing LeetCode, Codeforces and GitHub statistics side by side.">
+  <script src="/assets/js/theme-init.js"></script><link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <title>Developer Profile | LeetMetric</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/css/style.css"><link rel="stylesheet" href="/assets/css/site.css"><link rel="stylesheet" href="/assets/css/developer-profile.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <main class="page-main developer-page">
+    <section class="page-hero">
+      <div class="page-kicker">CROSS-PLATFORM DEVELOPER PROFILE</div>
+      <h1 class="page-title">Your work across<br><span style="color:var(--page-accent)">the developer ecosystem.</span></h1>
+      <p class="page-lead">View public LeetCode, Codeforces and GitHub signals in one place. These are read-only username lookups; no account password, OAuth token or private data is requested.</p>
+    </section>
+    <form id="developer-profile-form" class="developer-form" novalidate>
+      <div class="developer-field"><label for="dev-leetcode">LEETCODE USERNAME</label><input id="dev-leetcode" maxlength="30" placeholder="Optional" autocomplete="off"></div>
+      <div class="developer-field"><label for="dev-codeforces">CODEFORCES HANDLE</label><input id="dev-codeforces" maxlength="39" placeholder="Optional" autocomplete="off"></div>
+      <div class="developer-field"><label for="dev-github">GITHUB USERNAME</label><input id="dev-github" maxlength="39" placeholder="Optional" autocomplete="off"></div>
+      <button id="dev-submit" class="primary-button" type="submit">Build developer profile →</button>
+    </form>
+    <p id="dev-status" class="developer-status" role="status" aria-live="polite">Add at least one public username and build your profile.</p>
+    <section id="developer-results" hidden>
+      <div class="developer-results-heading"><div><div class="page-kicker">PUBLIC DATA SNAPSHOT</div><h2 id="developer-profile-heading">Developer profile</h2></div><span id="developer-refreshed"></span></div>
+      <div class="developer-platform-grid">
+        <article class="developer-platform-card" id="developer-leetcode-card">
+          <div class="developer-platform-head"><span>01 / LEETCODE</span><a id="developer-leetcode-link" target="_blank" rel="noopener noreferrer">Open profile ↗</a></div>
+          <h3 id="developer-leetcode-name">Not connected</h3><p id="developer-leetcode-note">Enter a LeetCode username to view coding practice statistics.</p>
+          <div id="developer-leetcode-metrics" class="developer-metrics"></div>
+        </article>
+        <article class="developer-platform-card" id="developer-codeforces-card">
+          <div class="developer-platform-head"><span>02 / CODEFORCES</span><a id="developer-codeforces-link" target="_blank" rel="noopener noreferrer">Open profile ↗</a></div>
+          <h3 id="developer-codeforces-name">Not connected</h3><p id="developer-codeforces-note">Enter a Codeforces handle to view public contest rating details.</p>
+          <div id="developer-codeforces-metrics" class="developer-metrics"></div>
+        </article>
+        <article class="developer-platform-card" id="developer-github-card">
+          <div class="developer-platform-head"><span>03 / GITHUB</span><a id="developer-github-link" target="_blank" rel="noopener noreferrer">Open profile ↗</a></div>
+          <h3 id="developer-github-name">Not connected</h3><p id="developer-github-note">Enter a GitHub username to view public repositories and profile signals.</p>
+          <div id="developer-github-metrics" class="developer-metrics"></div>
+          <div id="developer-github-languages" class="developer-language-list"></div>
+          <div id="developer-github-repositories" class="developer-repository-list"></div>
+        </article>
+      </div>
+      <p class="developer-disclaimer">Platform statistics are shown separately. LeetCode and Codeforces solved-problem counts are not added together because cross-platform problem identities may overlap. GitHub language and star summaries represent the latest public repository sample returned by GitHub (up to 100 owner repositories), not necessarily the entire account. Username lookup does not verify that all profiles belong to the same person.</p>
+      <div class="developer-actions"><button id="developer-export" type="button">Export snapshot as JSON</button><button id="developer-copy" type="button">Copy shareable lookup link</button></div>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="/assets/js/data-freshness.js"></script>
+  <script src="/assets/js/developer-platforms.js"></script><script src="/assets/js/developer-profile.js" defer></script><script src="/assets/js/site.js" defer></script>
+</body>
+</html>

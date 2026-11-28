@@ -1,4 +1,4 @@
-const { normalizeCodeforces, normalizeGitHub } = require("../developer-platforms");
+const { normalizeCodeforces, normalizeGitHub } = require("../assets/js/developer-platforms");
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
 const MAX_CACHE_ENTRIES = 200;

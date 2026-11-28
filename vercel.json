@@ -25,6 +25,94 @@
   ],
   "rewrites": [
     {
+      "source": "/",
+      "destination": "/pages/index.html"
+    },
+    {
+      "source": "/index.html",
+      "destination": "/pages/index.html"
+    },
+    {
+      "source": "/about.html",
+      "destination": "/pages/about.html"
+    },
+    {
+      "source": "/code-lab.html",
+      "destination": "/pages/code-lab.html"
+    },
+    {
+      "source": "/compare.html",
+      "destination": "/pages/compare.html"
+    },
+    {
+      "source": "/contact.html",
+      "destination": "/pages/contact.html"
+    },
+    {
+      "source": "/dashboard.html",
+      "destination": "/pages/dashboard.html"
+    },
+    {
+      "source": "/developer-profile.html",
+      "destination": "/pages/developer-profile.html"
+    },
+    {
+      "source": "/faq.html",
+      "destination": "/pages/faq.html"
+    },
+    {
+      "source": "/features.html",
+      "destination": "/pages/features.html"
+    },
+    {
+      "source": "/forgot-password.html",
+      "destination": "/pages/forgot-password.html"
+    },
+    {
+      "source": "/intelligence.html",
+      "destination": "/pages/intelligence.html"
+    },
+    {
+      "source": "/login.html",
+      "destination": "/pages/login.html"
+    },
+    {
+      "source": "/privacy.html",
+      "destination": "/pages/privacy.html"
+    },
+    {
+      "source": "/readiness.html",
+      "destination": "/pages/readiness.html"
+    },
+    {
+      "source": "/reports.html",
+      "destination": "/pages/reports.html"
+    },
+    {
+      "source": "/reset-password.html",
+      "destination": "/pages/reset-password.html"
+    },
+    {
+      "source": "/roadmap.html",
+      "destination": "/pages/roadmap.html"
+    },
+    {
+      "source": "/signup.html",
+      "destination": "/pages/signup.html"
+    },
+    {
+      "source": "/terms.html",
+      "destination": "/pages/terms.html"
+    },
+    {
+      "source": "/favicon.svg",
+      "destination": "/assets/images/favicon.svg"
+    },
+    {
+      "source": "/preview.png",
+      "destination": "/assets/images/preview.png"
+    },
+    {
       "source": "/api/user/profile",
       "destination": "/api/workspace/profile"
     },
