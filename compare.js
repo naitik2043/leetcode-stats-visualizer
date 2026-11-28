@@ -188,7 +188,8 @@
     try {
       const profiles = await Promise.all([fetchProfile(a), fetchProfile(b)]);
       render(a, profiles[0], b, profiles[1]);
-      setStatus("Both public profiles were loaded successfully.", "success");
+      const freshness = window.LeetMetricFreshness.combine(profiles);
+      setStatus("Both public profiles loaded. " + freshness.message, freshness.stale ? "warning" : "success");
     } catch (error) {
       setStatus(error.message || "Unable to compare these profiles right now.", "error");
     } finally {

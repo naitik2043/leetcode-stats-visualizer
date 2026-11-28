@@ -59,6 +59,7 @@
     const leetcode = snapshotData.leetcode && {
       username: snapshotData.leetcode.username,
       url: "https://leetcode.com/u/" + encodeURIComponent(snapshotData.leetcode.username) + "/",
+      bio: window.LeetMetricFreshness.describe(snapshotData.leetcode),
       metrics: [
         ["Problems solved", Number(snapshotData.leetcode.stats.totalSolved).toLocaleString()],
         ["Easy / Medium / Hard", [snapshotData.leetcode.stats.solved.easy, snapshotData.leetcode.stats.solved.medium, snapshotData.leetcode.stats.solved.hard].join(" / ")],
@@ -163,7 +164,9 @@
     });
     render(data);
     const loaded = keys.filter((key) => data[key]).length;
-    statusMessage(loaded + " of " + keys.length + " requested platform profile(s) loaded. Failures remain isolated to their platform.", loaded ? "success" : "error");
+    const freshness = data.leetcode ? " " + window.LeetMetricFreshness.describe(data.leetcode) : "";
+    const stale = data.leetcode && window.LeetMetricFreshness.isStale(data.leetcode);
+    statusMessage(loaded + " of " + keys.length + " requested platform profile(s) loaded. Failures remain isolated to their platform." + freshness, loaded ? (stale ? "warning" : "success") : "error");
     submit.disabled = false;
     submit.textContent = "Build developer profile →";
   });

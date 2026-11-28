@@ -1,4 +1,8 @@
-(function attachLeetMetricFreshness(root) {
+(function attachLeetMetricFreshness(root, factory) {
+  const api = factory();
+  if (root) root.LeetMetricFreshness = api;
+  if (typeof module === "object" && module.exports) module.exports = api;
+})(typeof window !== "undefined" ? window : (typeof globalThis !== "undefined" ? globalThis : this), function createLeetMetricFreshness() {
   "use strict";
   function describe(profile) {
     const cache = profile && profile.cache;
@@ -15,18 +19,12 @@
     }
     return "Public profile snapshot last fetched " + age + " ago.";
   }
-
   function isStale(profile) {
     return Boolean(profile && profile.cache && profile.cache.stale);
   }
-
   function combine(profiles) {
     const list = Array.isArray(profiles) ? profiles.filter(Boolean) : [];
-    return {
-      stale: list.some(isStale),
-      message: list.map((profile) => describe(profile)).join(" ")
-    };
+    return { stale: list.some(isStale), message: list.map(describe).join(" ") };
   }
-
-  root.LeetMetricFreshness = { describe, isStale, combine };
-})(window);
+  return { describe, isStale, combine };
+});

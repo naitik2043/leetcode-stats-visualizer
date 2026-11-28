@@ -161,7 +161,7 @@
       if (!response.ok) throw new Error(profile.error || "Unable to load this LeetCode profile.");
       const report = window.LeetMetricIntelligence.analyzeProfile(profile);
       render(report, profile);
-      setStatus("Analysis ready. Suggestions are based on the data returned for this profile.", "success");
+      setStatus("Analysis ready. " + window.LeetMetricFreshness.describe(profile), window.LeetMetricFreshness.isStale(profile) ? "warning" : "success");
     } catch (error) {
       setStatus(error.message || "A network error occurred. Please try again.", "error");
     } finally {

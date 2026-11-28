@@ -140,8 +140,8 @@
       workspace.hidden = false;
       loadSavedRatings(username);
       renderScore();
-      status.textContent = "Assessment ready. Adjust the self-rating controls and save your inputs.";
-      status.className = "readiness-status success";
+      status.textContent = "Assessment ready. " + window.LeetMetricFreshness.describe(profile);
+      status.className = "readiness-status " + (window.LeetMetricFreshness.isStale(profile) ? "warning" : "success");
       try { localStorage.setItem("leetmetric-last-username", username); } catch { /* Optional. */ }
     } catch (error) {
       status.textContent = error.message || "Unable to calculate the assessment.";

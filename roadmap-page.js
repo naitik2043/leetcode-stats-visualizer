@@ -98,7 +98,7 @@
       activeRoadmapId = "";
       renderPlan(plan);
       await refreshSavedRoadmaps();
-      setStatus("Roadmap generated. Save it to your account or keep a browser-local copy.", "success");
+      setStatus("Roadmap generated. " + window.LeetMetricFreshness.describe(profile), window.LeetMetricFreshness.isStale(profile) ? "warning" : "success");
     } catch (error) {
       setStatus(error.message || "Unable to generate a roadmap right now.", "error");
     } finally {

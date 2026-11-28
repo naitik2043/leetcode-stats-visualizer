@@ -192,7 +192,7 @@ if (form && input && searchButton && statusBox) {
       document.dispatchEvent(new CustomEvent("leetmetric:profile-loaded", {
         detail: { username, data }
       }));
-      setStatus("Profile statistics loaded successfully.", "success");
+      setStatus(window.LeetMetricFreshness.describe(data) + " Profile statistics loaded.", window.LeetMetricFreshness.isStale(data) ? "warning" : "success");
 
       const analytics = $("#analytics") || $("#insights");
       if (analytics) analytics.scrollIntoView({ behavior: "smooth", block: "start" });

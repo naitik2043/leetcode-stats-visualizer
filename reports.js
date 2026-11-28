@@ -172,9 +172,10 @@
     try {
       const payload = await makeReport(username);
       render(payload);
-      setStatus(payload.history.unavailable
-        ? "Report generated. Sign in with the profile owner account to include private snapshots."
-        : "Report generated successfully.", "success");
+      setStatus((payload.history.unavailable
+        ? "Report generated. Sign in with the profile owner account to include private snapshots. "
+        : "Report generated successfully. ") + window.LeetMetricFreshness.describe(payload.profile),
+        window.LeetMetricFreshness.isStale(payload.profile) ? "warning" : "success");
     } catch (error) {
       setStatus(error.message || "Unable to generate the report.", "error");
     } finally {
