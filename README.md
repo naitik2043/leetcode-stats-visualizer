@@ -127,12 +127,12 @@ The Code Review Lab does not execute user code. The shared intelligence engine i
 | LeetCode data | Public LeetCode GraphQL endpoint |
 | Hosting | Vercel |
 | Email recovery | Resend (optional, requires verified sender configuration) |
-| Testing | Node.js built-in test runner, GitHub Actions |
+| Testing | Node.js built-in test runner, Playwright, GitHub Actions |
 
 ## Run locally
 
 ### Prerequisites
-- Node.js 20 or later
+- Node.js 22 or later (required by the current Playwright browser-test toolchain)
 - npm
 - MongoDB Atlas cluster or local MongoDB
 - Vercel CLI
@@ -210,15 +210,22 @@ The intelligence, roadmap, code review, readiness and report calculations curren
 
 ## Quality checks
 
-Run:
+Run syntax, unit and static page-contract checks:
 
 ~~~bash
 npm run check
 ~~~
 
-The command performs JavaScript syntax checks and runs Node's built-in test suite. GitHub Actions runs the same command on pushes to main and feature branches and on pull requests targeting main.
+Run real Chromium browser smoke tests (navigation/theme, static code review and roadmap generation/fallback):
 
-Before production growth, add database-backed integration tests, end-to-end browser tests, accessibility automation, shared rate limiting and monitoring. Without Upstash credentials, rate limiting uses a bounded in-memory fallback scoped to each serverless instance. When both UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are configured, state-changing API limits use an atomic Redis Lua script shared across instances. If Redis is temporarily unavailable, the application logs a sanitized fallback event and uses its local limiter; that degraded mode is not globally distributed.
+~~~bash
+npx playwright install chromium
+npm run test:e2e
+~~~
+
+The command performs JavaScript syntax checks and runs Node's built-in test suite. GitHub Actions runs these checks on pushes to main and feature branches and on pull requests targeting main. The workflow installs Chromium and runs the Playwright smoke suite after the deterministic checks. The E2E tests mock public/API responses and do not require production credentials or a database.
+
+Before production growth, add database-backed integration tests, broader authenticated end-to-end coverage, automated accessibility scans and visual regression checks. The current browser suite is a focused smoke suite rather than full user-journey coverage. Without Upstash credentials, rate limiting uses a bounded in-memory fallback scoped to each serverless instance. When both UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are configured, state-changing API limits use an atomic Redis Lua script shared across instances. If Redis is temporarily unavailable, the application logs a sanitized fallback event and uses its local limiter; that degraded mode is not globally distributed.
 
 ## Roadmap
 

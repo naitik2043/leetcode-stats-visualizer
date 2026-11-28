@@ -17,3 +17,6 @@ Thumbs.db
 .idea/
 .cache/
 .tmp/
+
+playwright-report/
+test-results/

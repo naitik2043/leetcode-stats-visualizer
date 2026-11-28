@@ -42,12 +42,13 @@ This roadmap is the source of truth for shipped and planned work. A capability i
 - [x] Optional user-recorded attempts-before-acceptance and time-spent metadata, validated and aggregated only from the owner's private revision items.
 - [x] Personalized 7-day, 30-day and 90-day roadmap generator.
 - [x] Browser-local roadmap completion tracking and JSON export.
+- [x] Account-synchronized roadmap persistence, owner-scoped CRUD, optimistic version checks and conflict-safe progress updates.
 - [x] Multilingual static code review lab for C++, Java, Python, JavaScript and C.
 - [x] Interview preparation self-assessment combining DSA signals with user-entered ratings.
 - [x] Progress report preview with JSON and CSV export, printable layout and private history when authorized.
 - [x] Conservative next-milestone pace estimate, shown only with at least 7 days of positive net change in saved snapshots.
 - [x] Light/dark theme, responsive layouts, public feature index and product documentation.
-- [x] GitHub Actions syntax and unit-test workflow.
+- [x] GitHub Actions syntax, unit-test, static page-contract and Playwright browser smoke-test workflow.
 
 ## Known limitations
 
@@ -72,12 +73,14 @@ This roadmap is the source of truth for shipped and planned work. A capability i
 ### P1 — Reliability and durable learning
 - [x] Add cache freshness metadata and visibly label stale cached snapshots across public profile views.
 - [x] Persist generated roadmaps and completion data to authenticated accounts, with owner-scoped CRUD and version increments.
-- [ ] Add user-recorded attempt outcomes and optional time-to-solve tracking, with privacy controls.
+- [x] Add optional user-recorded attempts-before-acceptance and time-spent fields to private revision entries, with owner-scoped validation and privacy controls.
 - [x] Add a private account JSON export for the main workspace data and post-deletion record-count verification.
 - [ ] Add chunked/bulk exports for very large Code Vault libraries and a portable CSV workspace export.
-- [ ] Add end-to-end UI tests, accessibility automation and visual regression coverage.
-- [ ] Add a browser-driven release smoke suite for auth, dashboard, roadmap sync and account export.
-- [ ] Add a health endpoint, structured request-safe operational events, scheduled uptime checks and alerts.
+- [x] Add Playwright Chromium smoke tests for global navigation/theme, browser-only code analysis and roadmap generation/local fallback.
+- [ ] Expand browser coverage to authenticated dashboard flows, account export and roadmap cloud-sync conflict handling.
+- [ ] Add automated WCAG accessibility scans and visual regression coverage.
+- [x] Add a no-store database health endpoint and structured, allowlisted operational events that exclude account data and secrets.
+- [ ] Add scheduled uptime checks, alert delivery and operational dashboards.
 - [x] Add optional Upstash Redis-backed distributed rate limiting for state-changing APIs, with an in-memory fallback when unconfigured or unavailable.
 - [ ] Add shared Redis profile-cache storage before scaling, with cache invalidation and explicit TTL controls.
 
