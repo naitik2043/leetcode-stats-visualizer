@@ -136,7 +136,7 @@ The Code Review Lab does not execute user code. The shared intelligence engine i
 ### Prerequisites
 - Node.js 22 or later (required by the current Playwright browser-test toolchain)
 - npm
-- MongoDB Atlas cluster or local MongoDB
+- MongoDB Atlas cluster or a local MongoDB replica set (account deletion uses transactions)
 - Vercel CLI
 
 ### Installation
