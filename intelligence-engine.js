@@ -200,7 +200,7 @@
     const normalized = snapshots.map((item) => {
       const dateKey = String(item && item.dateKey || "");
       const totalSolved = Number(item && item.totalSolved);
-      if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(dateKey) || !Number.isSafeInteger(totalSolved) || totalSolved < 0) return null;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dateKey) || !Number.isSafeInteger(totalSolved) || totalSolved < 0) return null;
       const timestamp = Date.parse(dateKey + "T00:00:00.000Z");
       return Number.isFinite(timestamp) ? { dateKey, timestamp, totalSolved } : null;
     }).filter(Boolean).sort((a, b) => a.timestamp - b.timestamp);
