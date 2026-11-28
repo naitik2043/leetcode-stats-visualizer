@@ -68,6 +68,24 @@
           </table>
         </div>
       </article>
+      <div class="comparison-extra-grid">
+        <article class="comparison-table-card">
+          <h3>Topic coverage comparison</h3>
+          <p class="comparison-note">Public tag-level solved counts. A single problem can belong to multiple tags, so topic totals overlap.</p>
+          <div class="comparison-table-wrap">
+            <table class="comparison-table"><thead><tr><th>Topic</th><th id="topic-name-a">Profile A</th><th id="topic-name-b">Profile B</th></tr></thead><tbody id="topic-comparison-rows"></tbody></table>
+          </div>
+          <p id="topic-comparison-empty" class="comparison-note" hidden>Topic coverage was not available for one or both profiles.</p>
+        </article>
+        <article class="comparison-table-card">
+          <h3>Practice and contest signals</h3>
+          <p class="comparison-note">Activity values represent public calendar submissions, not unique accepted problems.</p>
+          <div class="comparison-table-wrap">
+            <table class="comparison-table"><thead><tr><th>Signal</th><th id="activity-name-a">Profile A</th><th id="activity-name-b">Profile B</th></tr></thead><tbody id="activity-comparison-rows"></tbody></table>
+          </div>
+        </article>
+      </div>
+      <div class="comparison-actions"><button id="comparison-copy-link" type="button">Copy comparison link</button><button id="comparison-export" type="button">Export CSV</button></div>
       <p class="comparison-disclaimer">Data comes from public LeetCode profile statistics. Topic counts are not a measure of mastery. Daily submission calendars and private submission details are not part of this comparison.</p>
     </section>
   </main>
