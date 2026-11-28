@@ -1,0 +1,36 @@
+.developer-page{max-width:1180px}
+.developer-form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:10px;align-items:end;margin:27px 0 0;padding:18px;border:1px solid var(--page-line);border-radius:12px;background:var(--surface-raised)}
+.developer-field label{display:block;margin-bottom:8px;color:var(--copy-soft);font:9px var(--page-mono);letter-spacing:.9px}
+.developer-field input{width:100%;padding:12px 11px;border:1px solid var(--control-border);border-radius:7px;background:var(--surface-input);color:var(--field-text);font:11px var(--page-font)}
+.developer-form button{width:auto;margin:0;white-space:nowrap}
+.developer-status{min-height:22px;margin:12px 0 0;color:var(--copy-muted);font-size:10px}.developer-status.error{color:#d86b6b}.developer-status.success{color:var(--page-accent)}
+.developer-results-heading{display:flex;justify-content:space-between;align-items:end;gap:15px;margin:37px 0 15px}
+.developer-results-heading h2{margin:7px 0 0;font-size:24px}
+.developer-results-heading>span{color:var(--copy-soft);font:9px var(--page-mono);text-align:right}
+.developer-platform-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.developer-platform-card{padding:21px;border:1px solid var(--page-line);border-radius:11px;background:var(--surface-raised);min-width:0}
+.developer-platform-card:last-child:nth-child(odd){grid-column:1/-1}
+.developer-platform-head{display:flex;justify-content:space-between;gap:10px;color:var(--copy-soft);font:9px var(--page-mono)}
+.developer-platform-head a{color:var(--page-accent);text-decoration:none}
+.developer-platform-card h3{margin:16px 0 6px;font-size:17px;overflow-wrap:anywhere}
+.developer-platform-card>p{min-height:28px;margin:0;color:var(--copy-muted);font-size:9px;line-height:1.6;overflow-wrap:anywhere}
+.developer-metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:15px}
+.developer-metric{padding:12px;border:1px solid var(--page-line);border-radius:8px;background:var(--surface-inset);min-width:0}
+.developer-metric span{display:block;color:var(--copy-soft);font-size:9px}
+.developer-metric strong{display:block;margin-top:7px;font-size:16px;overflow-wrap:anywhere}
+.developer-language-list,.developer-repository-list{margin-top:17px}
+.developer-language-list h4,.developer-repository-list h4{margin:0 0 9px;font-size:10px}
+.developer-language-chips{display:flex;flex-wrap:wrap;gap:7px}
+.developer-language-chips span{padding:7px 8px;border:1px solid var(--page-line);border-radius:6px;color:var(--copy-muted);font-size:9px}
+.developer-repository-list{display:grid;gap:8px}
+.developer-repository{display:grid;gap:4px;padding:11px;border:1px solid var(--page-line);border-radius:8px;background:var(--surface-inset);color:var(--text);text-decoration:none}
+.developer-repository strong{font-size:10px}.developer-repository span{color:var(--copy-muted);font-size:9px;line-height:1.5}.developer-repository small{color:var(--copy-soft);font-size:8px}
+.developer-disclaimer{margin:17px 0;color:var(--copy-soft);font-size:9px;line-height:1.8}
+.developer-actions{display:flex;gap:9px;margin:14px 0}
+.developer-actions button{padding:10px 13px;border:1px solid var(--page-line);border-radius:8px;background:var(--surface-raised);color:var(--text);font:700 10px var(--page-font);cursor:pointer}
+.developer-actions button:hover{border-color:var(--page-accent)}
+.developer-platform-head a[hidden]{display:none}
+@media(max-width:950px){.developer-form{grid-template-columns:repeat(2,minmax(0,1fr))}.developer-form button{width:100%}}
+@media(max-width:700px){.developer-platform-grid{grid-template-columns:1fr}.developer-platform-card:last-child:nth-child(odd){grid-column:auto}}
+@media(max-width:580px){.developer-form{grid-template-columns:1fr}.developer-results-heading{align-items:flex-start;flex-direction:column}.developer-results-heading>span{text-align:left}.developer-actions{flex-direction:column}.developer-actions button{width:100%}}
+@media print{#site-header,#site-footer,.page-hero,.developer-form,.developer-status,.developer-actions{display:none!important}.developer-page{max-width:none;padding:0}.developer-platform-card{break-inside:avoid;background:white;color:#111}}
