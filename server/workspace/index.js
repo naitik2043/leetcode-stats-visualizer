@@ -6,6 +6,8 @@ const User = require("../models/User");
 const ProfileSnapshot = require("../models/ProfileSnapshot");
 const Goal = require("../models/Goal");
 const RevisionItem = require("../models/RevisionItem");
+const CodePaste = require("../models/CodePaste");
+const IntegrationTicket = require("../models/IntegrationTicket");
 const {
   json,
   getSessionUser,
@@ -110,6 +112,8 @@ async function handleAccountDeletion(req, res) {
         await ProfileSnapshot.deleteMany({ userId: user._id }, { session });
         await Goal.deleteMany({ userId: user._id }, { session });
         await RevisionItem.deleteMany({ userId: user._id }, { session });
+        await CodePaste.deleteMany({ userId: user._id }, { session });
+        await IntegrationTicket.deleteMany({ userId: user._id }, { session });
         await User.deleteOne({ _id: user._id }, { session });
       });
     } finally {
@@ -119,7 +123,7 @@ async function handleAccountDeletion(req, res) {
     clearSessionCookie(res);
     return json(res, 200, {
       ok: true,
-      message: "Your account and its saved profiles, snapshots, goals and revision items have been deleted."
+      message: "Your account, saved profiles, snapshots, goals, revision items, Code Vault snippets and unused launch tickets have been deleted."
     });
   } catch (error) {
     if (isConfigurationError(error)) {

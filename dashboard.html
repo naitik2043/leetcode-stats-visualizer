@@ -56,7 +56,26 @@
       <a href="#share-card">Share</a>
       <a href="#profile-settings">Profile settings</a>
       <a href="#account-settings">Account</a>
+      <a href="#code-vault">Code Vault</a>
     </nav>
+
+    <section class="workspace-section" id="code-vault" aria-labelledby="code-vault-title">
+      <div class="workspace-section-heading">
+        <div><p class="page-kicker">YOUR SOLUTION LIBRARY</p><h2 id="code-vault-title">Code Vault</h2></div>
+        <p class="section-support">Keep LeetCode solutions, reusable patterns and debugging notes beside your progress analytics.</p>
+      </div>
+      <article class="workspace-card">
+        <div class="workspace-card-heading">
+          <div class="workspace-card-icon" aria-hidden="true">{ }</div>
+          <div><h3>Open your private snippet workspace</h3><p>Save and search C++, Python and other language solutions with problem links, tags and version history.</p></div>
+        </div>
+        <div class="snapshot-actions">
+          <button id="open-code-vault" class="workspace-primary-button" type="button">Open Code Vault <span aria-hidden="true">↗</span></button>
+          <span id="code-vault-status" class="form-status" role="status" aria-live="polite">Uses your existing LeetMetric sign-in. No second password needed.</span>
+        </div>
+        <p class="workspace-card-footnote">Snippets are private by default. You can create an unlisted share link for an individual snippet. Never store passwords, API keys or session tokens.</p>
+      </article>
+    </section>
 
     <section class="workspace-section" id="overview" aria-labelledby="overview-title">
       <div class="workspace-section-heading">
@@ -491,6 +510,7 @@
   <script src="/dashboard-extras.js" defer></script>
   <script src="/dashboard-revisions.js" defer></script>
   <script src="/dashboard-account.js" defer></script>
+  <script src="/dashboard-paste.js" defer></script>
   <script src="/site.js" defer></script>
 </body>
 </html>
