@@ -46,6 +46,8 @@ The JSON account export is intentionally bounded to a maximum of 200 Code Vault 
 
 Workspace records are scoped by authenticated `userId`; snapshots, goals, revisions and roadmaps are also bound to the account's saved LeetCode username where applicable. Resource IDs alone never grant access to another account's data.
 
+Account deletion uses a MongoDB multi-document transaction. The configured MongoDB deployment must support transactions (MongoDB Atlas or a replica-set / sharded deployment); a standalone local MongoDB server is not sufficient for that workflow.
+
 ## Operations
 
 | Method | Endpoint | Purpose |
