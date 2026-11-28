@@ -1,0 +1,38 @@
+.readiness-page{max-width:1120px}
+.readiness-profile-form{max-width:650px;margin-top:28px;padding:18px;border:1px solid var(--page-line);border-radius:12px;background:var(--surface-raised)}
+.readiness-profile-form label{display:block;margin-bottom:9px;color:var(--copy-soft);font:9px var(--page-mono);letter-spacing:1px}
+.readiness-profile-form>div{display:flex;align-items:center;gap:10px}
+.readiness-profile-form>div>span{color:var(--page-accent);font:15px var(--page-mono)}
+.readiness-profile-form input{flex:1;min-width:0;padding:12px 4px;border:0;outline:0;background:transparent;color:var(--text);font:12px var(--page-font)}
+.readiness-profile-form button{width:auto;margin:0;white-space:nowrap}
+.readiness-status{min-height:22px;margin-top:12px;color:var(--copy-muted);font-size:10px}.readiness-status.error{color:#d86b6b}.readiness-status.success{color:var(--page-accent)}
+.readiness-score-panel{display:grid;grid-template-columns:.7fr 1.3fr;gap:30px;margin-top:35px;padding:25px;border:1px solid var(--page-line);border-radius:13px;background:var(--surface-raised)}
+.readiness-score-panel>div:first-child>strong{display:inline-block;margin:14px 5px 0 0;font-size:62px;letter-spacing:-3px}
+.readiness-score-panel>div:first-child>span{color:var(--copy-soft);font:12px var(--page-mono)}
+.readiness-score-panel h2{margin:7px 0;font-size:17px}
+.readiness-score-panel p{color:var(--copy-muted);font-size:10px;line-height:1.7}
+.readiness-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:16px 22px;align-content:center}
+.readiness-breakdown-heading{display:flex;justify-content:space-between;gap:10px;margin-bottom:7px;color:var(--copy-muted);font-size:9px}
+.readiness-breakdown-heading strong{color:var(--text);font-family:var(--page-mono)}
+.readiness-track{height:6px;overflow:hidden;border-radius:20px;background:var(--page-line)}
+.readiness-track span{display:block;height:100%;border-radius:20px;background:var(--page-accent)}
+.readiness-assessment{margin-top:14px;padding:24px;border:1px solid var(--page-line);border-radius:12px;background:var(--surface-raised)}
+.readiness-section-heading{display:flex;justify-content:space-between;gap:20px;align-items:end;margin-bottom:18px}
+.readiness-section-heading h2{margin:7px 0 0;font-size:20px}
+.readiness-section-heading>p{max-width:420px;color:var(--copy-muted);font-size:9px;line-height:1.7}
+.readiness-rating{display:grid;grid-template-columns:1fr 220px;gap:25px;align-items:center;padding:17px 0;border-top:1px solid var(--page-line)}
+.readiness-rating label{display:flex;justify-content:space-between;gap:12px;font-size:11px;font-weight:800}
+.readiness-rating label strong{color:var(--page-accent);font:10px var(--page-mono);white-space:nowrap}
+.readiness-rating p{margin:6px 0 0;color:var(--copy-muted);font-size:9px;line-height:1.7}
+.readiness-rating input{width:100%;accent-color:var(--page-accent)}
+.readiness-controls{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:13px;padding-top:15px;border-top:1px solid var(--page-line)}
+.readiness-controls span{color:var(--copy-soft);font-size:9px}
+.readiness-controls button{padding:10px 13px;border:1px solid var(--page-line);border-radius:8px;background:var(--surface-inset);color:var(--text);font:700 10px var(--page-font);cursor:pointer}
+.readiness-actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.readiness-action{padding:15px;border:1px solid var(--page-line);border-radius:9px;background:var(--surface-inset)}
+.readiness-action-score{color:var(--page-accent);font:10px var(--page-mono)}
+.readiness-action h3{margin:7px 0;font-size:11px}
+.readiness-action p{margin:0;color:var(--copy-muted);font-size:9px;line-height:1.7}
+.readiness-disclaimer{margin-top:14px;color:var(--copy-soft);font-size:9px;line-height:1.8}
+@media(max-width:800px){.readiness-score-panel{grid-template-columns:1fr}.readiness-breakdown{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.readiness-profile-form>div{flex-wrap:wrap}.readiness-profile-form input{flex:1 1 80%}.readiness-profile-form button{width:100%}.readiness-breakdown,.readiness-actions{grid-template-columns:1fr}.readiness-section-heading{align-items:flex-start;flex-direction:column}.readiness-rating{grid-template-columns:1fr;gap:10px}.readiness-controls{align-items:flex-start;flex-direction:column}.readiness-controls button{width:100%}}

@@ -51,7 +51,7 @@
       <header class="site-header">
         <a class="brand" href="/"><span class="brand-mark">L<span>.</span></span><span>leet<span class="brand-light">metric</span></span></a>
         <nav class="desktop-nav" aria-label="Main navigation">
-          <a href="/" ${active("/")}>Home</a><a href="/features.html" ${active("/features.html")}>Features</a><a href="/intelligence.html" ${active("/intelligence.html")}>Intelligence</a><a href="/roadmap.html" ${active("/roadmap.html")}>Roadmap</a><a href="/code-lab.html" ${active("/code-lab.html")}>Code Lab</a><a href="/compare.html" ${active("/compare.html")}>Compare</a>
+          <a href="/" ${active("/")}>Home</a><a href="/features.html" ${active("/features.html")}>Features</a><a href="/intelligence.html" ${active("/intelligence.html")}>Intelligence</a><a href="/roadmap.html" ${active("/roadmap.html")}>Roadmap</a><a href="/code-lab.html" ${active("/code-lab.html")}>Code Lab</a><a href="/readiness.html" ${active("/readiness.html")}>Readiness</a><a href="/compare.html" ${active("/compare.html")}>Compare</a>
           <a href="/about.html" ${active("/about.html")}>About</a><a href="/faq.html" ${active("/faq.html")}>FAQ</a>
           <a href="/contact.html" ${active("/contact.html")}>Contact</a>
         </nav>
@@ -78,7 +78,7 @@
       <footer class="site-footer">
         <div class="footer-main">
           <div class="footer-intro"><a class="brand footer-brand" href="/"><span class="brand-mark">L<span>.</span></span><span>leet<span class="brand-light">metric</span></span></a><p>Understand your practice. Build consistency. Make your next coding milestone intentional.</p></div>
-          <div class="footer-column"><strong>PRODUCT</strong><a href="/features.html">Features</a><a href="/intelligence.html">Performance intelligence</a><a href="/roadmap.html">DSA roadmap</a><a href="/code-lab.html">Code review lab</a><a href="/reports.html">Progress reports</a><a href="/compare.html">Compare profiles</a><a href="/#insights">Stats dashboard</a><a href="/faq.html">FAQ</a></div>
+          <div class="footer-column"><strong>PRODUCT</strong><a href="/features.html">Features</a><a href="/intelligence.html">Performance intelligence</a><a href="/roadmap.html">DSA roadmap</a><a href="/code-lab.html">Code review lab</a><a href="/readiness.html">Interview readiness</a><a href="/reports.html">Progress reports</a><a href="/compare.html">Compare profiles</a><a href="/#insights">Stats dashboard</a><a href="/faq.html">FAQ</a></div>
           <div class="footer-column"><strong>COMPANY</strong><a href="/about.html">About LeetMetric</a><a href="/contact.html">Contact</a><a href="https://github.com/naitik2043/leetcode-stats-visualizer" target="_blank" rel="noreferrer">GitHub ↗</a></div>
           <div class="footer-column"><strong>LEGAL</strong><a href="/privacy.html">Privacy policy</a><a href="/terms.html">Terms of use</a></div>
         </div>

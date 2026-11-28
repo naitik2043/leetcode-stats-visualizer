@@ -161,7 +161,7 @@
         possibleRecursion: hasRecursionSignal
       },
       findings,
-      disclaimer: "Static heuristic only. This is not an AST-based compiler, runtime benchmark, correctness proof or AI review. Verify the result with language-specific tests and profiling."
+      disclaimer: "Static heuristic only. The tool does not compile, execute or prove submitted code. It is not an AST-based compiler, runtime benchmark, correctness proof or AI review. Verify results with language-specific tests and profiling."
     };
   }
 

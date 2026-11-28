@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#090d18"><meta name="description" content="Build a transparent interview preparation self-assessment using LeetMetric DSA practice signals and your own preparation checkpoints.">
+  <script src="/theme-init.js"></script>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg"><title>Interview Preparation Readiness | LeetMetric</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/site.css"><link rel="stylesheet" href="/readiness.css">
+</head>
+<body>
+  <div id="site-header"></div>
+  <main class="page-main readiness-page">
+    <section class="page-hero">
+      <div class="page-kicker">INTERVIEW PREPARATION</div>
+      <h1 class="page-title">Know what to work on<br><span style="color:var(--page-accent)">before the interview.</span></h1>
+      <p class="page-lead">Combine measurable LeetCode practice signals with an honest self-assessment of core CS knowledge, projects, communication and mock interviews.</p>
+      <form id="readiness-profile-form" class="readiness-profile-form" novalidate>
+        <label for="readiness-username">LEETCODE USERNAME</label>
+        <div><span aria-hidden="true">@</span><input id="readiness-username" maxlength="30" autocomplete="off" placeholder="e.g. Naitik_Gupta" required><button class="primary-button" type="submit">Calculate readiness →</button></div>
+      </form>
+      <p id="readiness-status" class="readiness-status" role="status" aria-live="polite">Load a public profile to start your preparation assessment.</p>
+    </section>
+
+    <section id="readiness-workspace" hidden>
+      <div class="readiness-score-panel">
+        <div><div class="page-kicker">PREPARATION INDEX</div><strong id="readiness-score">—</strong><span>/ 100</span><h2 id="readiness-label">Assessment summary</h2><p id="readiness-summary"></p></div>
+        <div id="readiness-breakdown" class="readiness-breakdown"></div>
+      </div>
+      <section class="readiness-assessment">
+        <div class="readiness-section-heading"><div><div class="page-kicker">SELF-ASSESSMENT</div><h2>Rate your preparation honestly</h2></div><p>These ratings are your own assessment. Update them as you gain practice.</p></div>
+        <form id="readiness-ratings">
+          <div class="readiness-rating">
+            <div><label for="rating-cs">Core CS fundamentals <strong id="value-cs">2 / 4</strong></label><p>Can you explain OOP, DBMS, operating systems, networks and basic system design?</p></div>
+            <input id="rating-cs" name="cs" type="range" min="0" max="4" step="1" value="2">
+          </div>
+          <div class="readiness-rating">
+            <div><label for="rating-projects">Project ownership <strong id="value-projects">2 / 4</strong></label><p>Can you explain architecture, trade-offs, challenges, testing and your individual contribution?</p></div>
+            <input id="rating-projects" name="projects" type="range" min="0" max="4" step="1" value="2">
+          </div>
+          <div class="readiness-rating">
+            <div><label for="rating-communication">Problem explanation <strong id="value-communication">2 / 4</strong></label><p>Can you clarify requirements, compare approaches and communicate complexity while solving?</p></div>
+            <input id="rating-communication" name="communication" type="range" min="0" max="4" step="1" value="2">
+          </div>
+          <div class="readiness-rating">
+            <div><label for="rating-mocks">Mock interview practice <strong id="value-mocks">2 / 4</strong></label><p>Have you practiced timed interviews, follow-up questions and explaining solutions aloud?</p></div>
+            <input id="rating-mocks" name="mocks" type="range" min="0" max="4" step="1" value="2">
+          </div>
+          <div class="readiness-rating">
+            <div><label for="rating-resume">Resume and role alignment <strong id="value-resume">2 / 4</strong></label><p>Is your resume accurate, project evidence accessible and preparation aligned with target roles?</p></div>
+            <input id="rating-resume" name="resume" type="range" min="0" max="4" step="1" value="2">
+          </div>
+          <div class="readiness-controls"><span id="readiness-save-status">Your self-assessment is stored in this browser.</span><button id="readiness-save" type="button">Save assessment</button></div>
+        </form>
+      </section>
+      <section class="readiness-assessment">
+        <div class="readiness-section-heading"><div><div class="page-kicker">NEXT ACTIONS</div><h2>Focus areas to strengthen</h2></div></div>
+        <div id="readiness-actions" class="readiness-actions"></div>
+      </section>
+      <p class="readiness-disclaimer">This is a preparation self-assessment, not an employer score, hiring prediction or guarantee of interview success. The DSA component is computed from public profile signals; other components are self-reported. Keep the ratings honest and use them to guide practice, not to compare yourself with other candidates.</p>
+    </section>
+  </main>
+  <div id="site-footer"></div>
+  <script src="/intelligence-engine.js"></script><script src="/readiness.js" defer></script><script src="/site.js" defer></script>
+</body>
+</html>
