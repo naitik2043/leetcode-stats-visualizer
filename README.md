@@ -1,5 +1,7 @@
 # LeetMetric — DSA Performance Intelligence Workspace
 
+[![Quality checks](https://github.com/naitik2043/leetcode-stats-visualizer/actions/workflows/quality.yml/badge.svg?branch=main)](https://github.com/naitik2043/leetcode-stats-visualizer/actions/workflows/quality.yml) [![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
 LeetMetric is an independent LeetCode analytics and learning workspace. It turns publicly available profile statistics into transparent practice signals, then combines them with private goals, revision notes and exportable reports.
 
 **Live site:** https://leetmetric-sooty.vercel.app  
@@ -83,35 +85,35 @@ Browser
   |
   +-- Static HTML / CSS / Vanilla JavaScript
   |     +-- intelligence-engine.js (shared deterministic calculations)
-  |     +-- page-specific modules and accessible UI states
+  |     +-- page modules, theme and accessible UI states
   |
   +-- Vercel Node.js Functions
         +-- /api/leetcode/:username
         |     +-- LeetCode public GraphQL
-        |     +-- normalization, bounded cache and request deduplication
+        |     +-- normalized profile, freshness metadata and bounded cache
         |
         +-- /api/developer/:platform/:username
         |     +-- Codeforces public API / GitHub REST API
-        |     +-- allowlisted providers, timeout, bounded cache and request deduplication
+        |     +-- allowlisted providers, timeout and bounded per-instance cache
         |
         +-- /api/auth/*
         |     +-- bcryptjs password hashing
         |     +-- JWT in HttpOnly cookie
         |
-        +-- /api/workspace/*
-        |     +-- saved profile, account deletion
-        |     +-- daily snapshots and goals
-        |     +-- private revisions
+        +-- /api/workspace/* (shared catch-all handler)
+        |     +-- account profile, export and verified deletion
+        |     +-- daily snapshots, goals and private revisions
+        |     +-- saved DSA roadmaps with version-checked updates
+        |     +-- no-store MongoDB health check
         |
         +-- /api/integrations/paste
-        |     +-- short-lived one-time Paste Vault ticket
+        |     +-- short-lived, single-use Paste Vault ticket
         |
         +-- /api/contact
               +-- validated contact-message persistence
                     |
                     v
                  MongoDB
-~~~
 
 The Code Review Lab does not execute user code. The shared intelligence engine is dependency-free and can be tested in Node.js while also being loaded by browser pages.
 
@@ -224,7 +226,7 @@ npx playwright install chromium
 npm run test:e2e
 ~~~
 
-The command performs JavaScript syntax checks, static HTML/asset contract checks and runs Node's built-in unit test suite. GitHub Actions runs these checks on pushes to main and feature branches and on pull requests targeting main. The workflow installs Chromium and runs the Playwright smoke suite after the deterministic checks. The E2E tests mock public/API responses and do not require production credentials or a database.
+The command performs JavaScript syntax checks, static HTML/asset contract checks and runs Node's built-in unit test suite. GitHub Actions uses Node.js 24 and runs these checks on pushes to main and feature branches and on pull requests targeting main. The workflow then installs Chromium and runs three Playwright smoke journeys: homepage navigation/theme persistence, browser-only code analysis, and roadmap generation with stale-data and local-save fallback handling. These E2E tests mock public/API responses and do not require production credentials or a database. The green badge above reflects the latest `quality.yml` workflow on `main`; it is separate from Vercel deployment status.
 
 Before production growth, add database-backed integration tests, broader authenticated end-to-end coverage, automated accessibility scans and visual regression checks. An hourly GitHub Actions uptime monitor is included; set the `LEETMETRIC_HEALTHCHECK_URL` Actions secret after the health endpoint is deployed. Optionally set `OPS_ALERT_WEBHOOK_URL` to receive failure notifications. The current browser suite is a focused smoke suite rather than full user-journey coverage. Without Upstash credentials, rate limiting uses a bounded in-memory fallback scoped to each serverless instance. When both UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are configured, state-changing API limits use an atomic Redis Lua script shared across instances. If Redis is temporarily unavailable, the application logs a sanitized fallback event and uses its local limiter; that degraded mode is not globally distributed.
 
