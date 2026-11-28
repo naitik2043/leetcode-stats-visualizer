@@ -1,100 +1,105 @@
 # LeetMetric product roadmap
 
-This roadmap keeps implementation incremental. A feature is marked complete only after its user flow, data source, error handling and tests are in place.
+This roadmap is the source of truth for shipped and planned work. A capability is marked shipped only when its user flow, data handling, limitations and relevant automated tests are documented.
 
 ## Product principles
 
-- **Accurate before impressive:** never display estimated or generated values as official LeetCode metrics.
-- **Privacy by default:** never request LeetCode passwords, session cookies or browser tokens.
-- **Progressive enhancement:** public lookup must continue working without a signed-in account.
-- **Responsive by design:** every new screen must work with keyboard, touch, narrow mobile widths and desktop layouts.
-- **Reliable integrations:** treat LeetCode's public GraphQL endpoint as an upstream dependency, not a guaranteed commercial API.
-- **Small, reviewable releases:** ship one coherent phase at a time with tests and a documented change summary.
+- **Accuracy before spectacle:** never present estimates, heuristic output or generated suggestions as official LeetCode metrics.
+- **Privacy by default:** never request a LeetCode password, session cookie or browser token.
+- **Progressive enhancement:** public profile lookup remains available without an account.
+- **Transparent limitations:** missing upstream data stays missing; do not fabricate values.
+- **Reviewable delivery:** ship coherent changes with meaningful commits, tests and accurate documentation.
 
-## Phase 0 — Product and engineering foundation
+## Shipped capabilities
 
-**Status: implemented in the core dashboard foundation release**
+### Public analytics
+- [x] Public LeetCode username lookup and normalized difficulty/submission statistics.
+- [x] Public submission activity calendar and current streak when available.
+- [x] Contest rating, global ranking, participation and attended-contest history when available.
+- [x] Tag-level topic solved counts, with explicit overlap and non-mastery caveats.
+- [x] Side-by-side public profile comparison with difficulty, submissions, topic coverage, activity and contest signals.
+- [x] Shareable comparison links and CSV export.
+- [x] Bounded process-local cache, request deduplication, input validation and upstream timeouts.
 
-- [x] Reorganize the signed-in dashboard into overview, analytics, profile settings and account settings.
-- [x] Provide responsive layouts for desktop, tablet and mobile widths.
-- [x] Add an accessible difficulty distribution chart using values returned by the existing profile API.
-- [x] Show total question-bank coverage and the last successful fetch time.
-- [x] Add explanatory copy for solved problems versus submission attempts.
-- [x] Extract LeetCode response normalization into a dependency-free service.
-- [x] Bound the process-local cache and deduplicate concurrent requests for the same username.
-- [x] Add unit tests for profile normalization and malformed counters.
-- [x] Add GitHub Actions quality checks.
+### Personal workspace
+- [x] Account registration, login/logout, HttpOnly cookie sessions and password reset token flow.
+- [x] Saved LeetCode username and account deletion workflow.
+- [x] Private daily profile snapshots with 180-day retention.
+- [x] Historical solved-count trend and snapshot table.
+- [x] 7-day and 30-day goals measured from saved snapshot baselines.
+- [x] Private revision queue and mistake journal with topic, difficulty, mistake type, notes and status.
+- [x] Browser-generated profile card export.
+- [x] Deterministic 7-day editable practice planner on the dashboard.
+- [x] Private Paste Vault handoff using a short-lived one-time token; Paste Vault is a separate application.
 
-## Phase 1 — Historical progress and richer LeetCode analytics
+### Learning intelligence and product tools
+- [x] Shared deterministic intelligence engine for profile normalization, activity windows, recommendations and topic coverage signals.
+- [x] Transparent practice foundation index with published equal-weight methodology.
+- [x] Evidence-linked practice recommendations and lower solved-count topic candidates.
+- [x] Private mistake-pattern summary derived only from the signed-in user's revision records.
+- [x] Personalized 7-day, 30-day and 90-day roadmap generator.
+- [x] Browser-local roadmap completion tracking and JSON export.
+- [x] Multilingual static code review lab for C++, Java, Python, JavaScript and C.
+- [x] Interview preparation self-assessment combining DSA signals with user-entered ratings.
+- [x] Progress report preview with JSON and CSV export, printable layout and private history when authorized.
+- [x] Conservative next-milestone pace estimate, shown only with at least 7 days of positive net change in saved snapshots.
+- [x] Light/dark theme, responsive layouts, public feature index and product documentation.
+- [x] GitHub Actions syntax and unit-test workflow.
 
-**Status: private snapshots and personal goals are implemented; daily heatmap and contest analytics remain pending**
+## Known limitations
 
-- [x] Persist one private, timestamped profile snapshot per UTC day for a user's saved profile.
-- [x] Add a historical solved-count trend and snapshot table (requires at least two saved days).
-- [x] Add a public submission heatmap and current streak from the LeetCode calendar response.
-- [x] Add contest rating, global ranking, participation count and attended-contest rating history.
-- [ ] Add refresh timestamps, stale-data labels and clear upstream availability states.
-- [x] Automatically expire snapshots after 180 days and provide authenticated account deletion for snapshots, goals and revision items.
+- LeetMetric relies on LeetCode's public GraphQL endpoint; it is not a guaranteed, versioned commercial API and may return partial data or change fields.
+- Public profile calendar entries are submission counts, not unique accepted problems, exact study time or complete attempt-level histories.
+- The topic intelligence engine uses tag-level solved counts as directional coverage signals. Tag categories overlap and do not establish mastery.
+- First-attempt success, retries per problem and time-to-solve cannot be reliably inferred from the current public profile response. These require separately collected user data or an authorized data source.
+- The practice foundation index measures a deliberately small set of observable signals. It is not a hiring prediction or a validated interview-readiness score.
+- The roadmap generator creates an editable study outline, not a verified list of LeetCode problem URLs. Roadmap completion is stored in the current browser, not the account database.
+- The Code Review Lab is static pattern matching. It is not an AST-based compiler, AI reviewer, execution sandbox, complexity proof or correctness verifier.
+- Interview preparation self-ratings are user-entered and stored in the current browser.
+- Progress exports include private snapshots only when the signed-in account has saved the selected username.
+- Current rate limits are in-memory per serverless function instance. A shared distributed limiter is required before higher-traffic production use.
+- The frontend remains static HTML/CSS/Vanilla JavaScript with Vercel Node.js functions. React/Vite and an Express service are not part of the current implementation.
+- The Paste Vault integration requires PASTE_APP_URL, shared MongoDB configuration and its own deployment.
 
-## Phase 2 — Topic intelligence and comparison
+## Planned work
 
-**Status: public profile comparison implemented; reliable topic-level metadata remains pending**
+### P1 — Reliability and durable learning
+- [ ] Add stale-data metadata and improved upstream degradation states across all profile views.
+- [ ] Persist generated roadmaps and completion data to authenticated accounts, with edit/version history.
+- [ ] Add user-recorded attempt outcomes and optional time-to-solve tracking, with privacy controls.
+- [ ] Add account-level CSV/JSON export and a complete data export/delete verification flow.
+- [ ] Add end-to-end UI tests, accessibility automation and visual regression coverage.
+- [ ] Add observability, operational alerts and upstream health monitoring.
+- [ ] Introduce Redis/Upstash shared caching and distributed rate limiting before scaling.
 
-- [x] Add topic-level solved counts grouped by LeetCode's fundamental, intermediate and advanced tags.
-- [x] Show the most-practiced tags by solved count, with copy clarifying that tag counts are not mastery scores.
-- [x] Compare two public profiles using the same metric definitions for solved counts, submissions and acceptance rate.
-- [ ] Add side-by-side difficulty, topic and contest comparisons.
-- [ ] Label unavailable or partial data instead of filling gaps with assumptions.
+### P2 — AI-assisted learning and interview preparation
+- [ ] Add optional server-side AI study coach grounded only in verified user analytics and revision notes.
+- [ ] Add AI explanations with citations to the exact metrics used and a clear AI-generated label.
+- [ ] Add verified problem test execution in an isolated sandbox; never run untrusted code in the main API process.
+- [ ] Add mock interview workflows and structured feedback rubrics.
+- [ ] Add company-specific preparation only with a maintained, licensed or otherwise reliable question data source.
 
-## Phase 3 — Personal practice workspace
+### P3 — Developer ecosystem
+- [ ] Add CodeChef, Codeforces, AtCoder, GeeksforGeeks and GitHub integrations where stable public APIs or permitted data sources exist.
+- [ ] Add profile ownership verification and explicit connection/disconnection controls.
+- [ ] Build a unified developer profile with source attribution and duplicate-problem handling.
+- [ ] Add public challenges, leaderboards and social features only with moderation, reporting and privacy controls.
 
-**Priority: P1**
-
-- [x] Add user-defined 7-day and 30-day problem-solving goals with snapshot-based baselines and progress.
-- [x] Add a private revision queue and mistake journal with title, optional problem URL, topic, difficulty, revisit reason, notes and status tracking.
-- [x] Add browser-generated PNG developer profile cards for the current public profile.
-- [x] Add a deterministic 7-day editable practice planner grounded in the current profile's difficulty coverage and public topic counts. (The plan is generated in-browser and is not persisted.)
-- [x] Add a private DSA revision queue and mistake journal with queued/revisiting/mastered statuses.
-- [ ] Add a transparent consistency score based on recorded activity.
-- [ ] Add an interview-readiness estimate with a published methodology.
-
-## Phase 4 — AI study coach
-
-**Priority: P2**
-
-- [ ] Add an optional AI coach grounded in stored, verified user analytics.
-- [ ] Generate editable 7-day, 30-day and 90-day practice plans.
-- [ ] Explain recommendations and cite the metrics that informed them.
-- [ ] Add a weekly report with a clear distinction between measured values and AI-generated advice.
-- [ ] Keep AI credentials server-side and provide graceful fallback when AI is not configured.
-
-## Phase 5 — Community and achievements
-
-**Priority: P2**
-
-- [ ] Add public developer profiles and shareable profile cards.
-- [ ] Add friend connections and private friend comparisons.
-- [ ] Add transparent weekly and monthly leaderboards.
-- [ ] Add challenges and achievements with verifiable award criteria.
-- [ ] Add reporting, blocking and privacy controls before public social features.
-
-## Phase 6 — Multi-platform developer analytics
-
-**Priority: P3**
-
-- [ ] Add CodeChef, Codeforces, AtCoder and HackerRank integrations where stable public data is available.
-- [ ] Add GitHub OAuth and public repository analytics.
-- [ ] Prevent duplicate problem counts across platforms where problem identity can be matched.
-- [ ] Create a unified developer profile and exportable report.
+### Platform evolution
+- [ ] Migrate the static frontend to React + Vite in incremental route-sized steps after parity tests exist.
+- [ ] Evaluate an Express service only if routing, background jobs or deployment needs justify a separate API runtime.
+- [ ] Add API versioning and shared service contracts before introducing multiple frontends.
+- [ ] Keep deployment and production release steps explicit; code pushes must not silently trigger a manual Vercel redeploy request.
 
 ## Release acceptance checklist
 
-Every phase must pass:
+Every release should pass:
 
-1. The npm quality command and the relevant integration tests.
-2. Keyboard navigation and visible focus checks.
-3. Responsive checks at approximately 360px, 390px, 768px, 1024px and 1440px.
+1. npm run check and relevant unit/integration tests.
+2. Loading, empty, invalid-input, unauthorized, rate-limit, timeout and upstream-error states.
+3. Keyboard navigation, visible focus, accessible labels and reduced-motion behavior.
 4. Dark and light theme checks.
-5. Loading, empty, invalid-input, rate-limit, timeout and upstream-error states.
-6. No secrets, LeetCode credentials or private session data in browser code or logs.
-7. Documentation that distinguishes implemented features from roadmap items.
+5. Responsive checks around 360px, 390px, 768px, 1024px and 1440px.
+6. No secrets, LeetCode credentials, reset tokens or private session data in frontend code or logs.
+7. Documentation that distinguishes shipped behavior from planned work.
+8. No production deployment unless explicitly requested.
