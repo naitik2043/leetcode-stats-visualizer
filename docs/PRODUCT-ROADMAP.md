@@ -56,11 +56,11 @@ This roadmap is the source of truth for shipped and planned work. A capability i
 - The topic intelligence engine uses tag-level solved counts as directional coverage signals. Tag categories overlap and do not establish mastery.
 - First-attempt success, retries per problem and time-to-solve cannot be reliably inferred from the current public profile response. LeetMetric therefore offers optional manual fields in the private revision journal; their aggregate reflects only the problems the user records and is not a complete account-wide rate.
 - The practice foundation index measures a deliberately small set of observable signals. It is not a hiring prediction or a validated interview-readiness score.
-- The roadmap generator creates an editable study outline, not a verified list of LeetCode problem URLs. Roadmap completion is stored in the current browser, not the account database.
+- The roadmap generator creates an editable study outline, not a verified list of LeetCode problem URLs. Completion can be stored locally or synchronized to the signed-in account when the saved profile matches.
 - The Code Review Lab is static pattern matching. It is not an AST-based compiler, AI reviewer, execution sandbox, complexity proof or correctness verifier.
 - Interview preparation self-ratings are user-entered and stored in the current browser.
 - Progress exports include private snapshots only when the signed-in account has saved the selected username.
-- Current rate limits are in-memory per serverless function instance. A shared distributed limiter is required before higher-traffic production use.
+- When Upstash is configured, rate-limit counters are shared atomically across serverless instances. If it is absent or unavailable, the fallback is bounded but process-local; it is not a global limit.
 - The frontend remains static HTML/CSS/Vanilla JavaScript with Vercel Node.js functions. React/Vite and an Express service are not part of the current implementation.
 - Codeforces API calls are subject to the platform’s documented request-frequency limit; the serverless adapter adds per-instance pacing and caching, but cannot guarantee a global request schedule across separate serverless instances. GitHub public REST requests are subject to unauthenticated rate limits.
 - GitHub language and star totals use a bounded recent repository sample (up to 100 owner repositories), not all repositories.
@@ -70,13 +70,16 @@ This roadmap is the source of truth for shipped and planned work. A capability i
 ## Planned work
 
 ### P1 — Reliability and durable learning
-- [ ] Add stale-data metadata and improved upstream degradation states across all profile views.
-- [ ] Persist generated roadmaps and completion data to authenticated accounts, with edit/version history.
+- [x] Add cache freshness metadata and visibly label stale cached snapshots across public profile views.
+- [x] Persist generated roadmaps and completion data to authenticated accounts, with owner-scoped CRUD and version increments.
 - [ ] Add user-recorded attempt outcomes and optional time-to-solve tracking, with privacy controls.
-- [ ] Add account-level CSV/JSON export and a complete data export/delete verification flow.
+- [x] Add a private account JSON export for the main workspace data and post-deletion record-count verification.
+- [ ] Add chunked/bulk exports for very large Code Vault libraries and a portable CSV workspace export.
 - [ ] Add end-to-end UI tests, accessibility automation and visual regression coverage.
-- [ ] Add observability, operational alerts and upstream health monitoring.
-- [ ] Introduce Redis/Upstash shared caching and distributed rate limiting before scaling.
+- [ ] Add a browser-driven release smoke suite for auth, dashboard, roadmap sync and account export.
+- [ ] Add a health endpoint, structured request-safe operational events, scheduled uptime checks and alerts.
+- [x] Add optional Upstash Redis-backed distributed rate limiting for state-changing APIs, with an in-memory fallback when unconfigured or unavailable.
+- [ ] Add shared Redis profile-cache storage before scaling, with cache invalidation and explicit TTL controls.
 
 ### P2 — AI-assisted learning and interview preparation
 - [ ] Add optional server-side AI study coach grounded only in verified user analytics and revision notes.

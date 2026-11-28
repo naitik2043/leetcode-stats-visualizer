@@ -4,6 +4,7 @@ The `api/` directory contains serverless Node.js handlers deployed by Vercel. To
 
 ## Routes
 
+- `GET /api/health` — no-store health check for the workspace database connection.
 - `GET /api/leetcode/:username` — public LeetCode profile lookup and normalization.
 - `POST /api/auth/signup` — create a MongoDB-backed account.
 - `POST /api/auth/login` — start an HttpOnly-cookie session.

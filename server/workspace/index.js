@@ -15,7 +15,7 @@ const {
   publicUser,
   clearSessionCookie,
   enforceSameOrigin,
-  rateLimit,
+  rateLimitShared,
   methodNotAllowed
 } = require("../auth");
 const {
@@ -29,6 +29,7 @@ const {
   normalizeRevisionUpdate
 } = require("../revisions");
 const { normalizeRoadmapInput, normalizeRoadmapUpdate } = require("../roadmaps");
+const { logEvent } = require("../observability");
 
 function isConfigurationError(error) {
   return error.code === "DATABASE_NOT_CONFIGURED" || error.code === "AUTH_NOT_CONFIGURED";
@@ -39,7 +40,53 @@ function sendConfigurationError(res, message) {
 }
 
 function logFailure(label, error) {
-  console.error(label, error && error.name ? error.name : "UnknownError");
+  logEvent(label, {
+    component: "workspace",
+    errorName: error && error.name ? error.name : "UnknownError"
+  }, "error");
+}
+
+
+async function handleHealth(req, res) {
+  if (req.method !== "GET") return methodNotAllowed(req, res, "GET");
+  const startedAt = Date.now();
+  try {
+    await connectToDatabase();
+    if (!mongoose.connection.db) throw new Error("Database handle unavailable");
+    await mongoose.connection.db.admin().ping();
+    const durationMs = Date.now() - startedAt;
+    logEvent("health_check_succeeded", {
+      component: "database",
+      route: "/api/health",
+      method: "GET",
+      statusCode: 200,
+      durationMs
+    });
+    return json(res, 200, {
+      status: "ok",
+      checks: { database: "ok" },
+      timestamp: new Date().toISOString(),
+      durationMs
+    });
+  } catch (error) {
+    const durationMs = Date.now() - startedAt;
+    logEvent("health_check_failed", {
+      component: "database",
+      route: "/api/health",
+      method: "GET",
+      statusCode: 503,
+      durationMs,
+      errorName: error && error.name ? error.name : "UnknownError"
+    }, "warn");
+    return json(res, 503, {
+      status: "degraded",
+      checks: { database: "unavailable" },
+      message: isConfigurationError(error)
+        ? "Account storage is not configured."
+        : "The database health check could not complete.",
+      timestamp: new Date().toISOString()
+    });
+  }
 }
 
 async function handleProfile(req, res) {
@@ -277,7 +324,7 @@ function snapshotPayload(snapshot) {
 async function handleSnapshots(req, res) {
   if (req.method !== "GET" && req.method !== "POST") return methodNotAllowed(req, res, "GET, POST");
   if (req.method === "POST" && !enforceSameOrigin(req, res)) return;
-  if (req.method === "POST" && !rateLimit(req, res, "snapshot", 30, 60 * 60 * 1000)) return;
+  if (req.method === "POST" && !await rateLimitShared(req, res, "snapshot", 30, 60 * 60 * 1000)) return;
 
   try {
     await connectToDatabase();
@@ -376,7 +423,7 @@ const GOAL_PERIOD_DAYS = { "7d": 7, "30d": 30 };
 async function handleGoals(req, res) {
   if (req.method !== "GET" && req.method !== "POST") return methodNotAllowed(req, res, "GET, POST");
   if (req.method === "POST" && !enforceSameOrigin(req, res)) return;
-  if (req.method === "POST" && !rateLimit(req, res, "goals", 20, 60 * 60 * 1000)) return;
+  if (req.method === "POST" && !await rateLimitShared(req, res, "goals", 20, 60 * 60 * 1000)) return;
 
   try {
     await connectToDatabase();
@@ -537,7 +584,7 @@ function revisionPayload(item) {
 async function handleRevisions(req, res) {
   if (req.method !== "GET" && req.method !== "POST") return methodNotAllowed(req, res, "GET, POST");
   if (req.method === "POST" && !enforceSameOrigin(req, res)) return;
-  if (req.method === "POST" && !rateLimit(req, res, "revisions", 30, 60 * 60 * 1000)) return;
+  if (req.method === "POST" && !await rateLimitShared(req, res, "revisions", 30, 60 * 60 * 1000)) return;
 
   try {
     await connectToDatabase();
@@ -653,7 +700,7 @@ function roadmapPayload(item) {
 async function handleRoadmaps(req, res) {
   if (req.method !== "GET" && req.method !== "POST") return methodNotAllowed(req, res, "GET, POST");
   if (req.method === "POST" && !enforceSameOrigin(req, res)) return;
-  if (req.method === "POST" && !rateLimit(req, res, "roadmaps", 20, 60 * 60 * 1000)) return;
+  if (req.method === "POST" && !await rateLimitShared(req, res, "roadmaps", 20, 60 * 60 * 1000)) return;
 
   try {
     await connectToDatabase();
@@ -743,6 +790,7 @@ module.exports = async function workspaceHandler(req, res) {
   const segments = (Array.isArray(rawPath) ? rawPath : [rawPath])
     .filter((part) => typeof part === "string" && part.length > 0);
 
+  if (segments.length === 1 && segments[0] === "health") return handleHealth(req, res);
   if (segments.length === 1 && segments[0] === "profile") return handleProfile(req, res);
   if (segments.length === 1 && segments[0] === "export") return handleAccountExport(req, res);
   if (segments.length === 1 && segments[0] === "roadmaps") return handleRoadmaps(req, res);

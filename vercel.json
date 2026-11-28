@@ -63,6 +63,10 @@
     {
       "source": "/api/user/export",
       "destination": "/api/workspace/export"
+    },
+    {
+      "source": "/api/health",
+      "destination": "/api/workspace/health"
     }
   ]
 }

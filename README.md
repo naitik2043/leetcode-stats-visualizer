@@ -39,6 +39,9 @@ LeetMetric is an independent LeetCode analytics and learning workspace. It turns
 - Side-by-side comparison with difficulty, submission, topic, activity and contest metrics.
 - Shareable comparison URL and CSV export.
 - Private daily profile snapshots, historical trend and 180-day retention.
+- Account-synchronized 7/30/90-day roadmaps with owner-scoped CRUD, saved weekly completion state, and version tracking.
+- A private JSON account-data export covering snapshots, goals, revisions, roadmaps and Code Vault snippets.
+- Transaction-backed account deletion followed by a record-count verification receipt.
 - 7-day and 30-day personal goals measured against saved snapshot baselines.
 - Private DSA revision queue and mistake journal.
 - Browser-generated PNG profile card.
@@ -51,7 +54,7 @@ LeetMetric is an independent LeetCode analytics and learning workspace. It turns
 - Lower solved-count topic candidates and evidence-linked practice suggestions.
 - Private revision mistake summary derived from the signed-in user's saved revision entries.
 - Optional user-recorded attempts-before-acceptance and time-spent fields per revision, with aggregate first-attempt rate and average logged time. These represent only the entries the user records, not all LeetCode submissions.
-- Personalized 7-day, 30-day and 90-day DSA roadmap generation, local completion checkboxes and JSON export.
+- Personalized 7-day, 30-day and 90-day DSA roadmap generation, browser-local progress, account synchronization and JSON export.
 - Browser-only static code review heuristics for common loop, sorting and collection patterns.
 - Interview preparation self-assessment combining a DSA practice signal with user-entered ratings for CS fundamentals, project ownership, communication, mock interviews and resume alignment.
 - Progress reports with JSON/CSV export, print support and conservative next-milestone pace estimate when sufficient private history exists.
@@ -61,11 +64,11 @@ LeetMetric is an independent LeetCode analytics and learning workspace. It turns
 
 LeetMetric deliberately labels derived metrics and heuristics:
 
-- The public LeetCode GraphQL endpoint is an upstream dependency, not a guaranteed versioned API. Fields can be partial or change.
+- The public LeetCode GraphQL endpoint is an upstream dependency, not a guaranteed versioned API. Fields can be partial or change. Profile responses include freshness metadata and may serve a clearly labelled cached snapshot for up to one hour during transient upstream failures.
 - Public calendar counts are submissions, not unique accepted problems or exact time spent studying.
 - Topic tags overlap and lower solved counts are directional coverage candidates, not proof of weak mastery.
 - The practice foundation index is a limited learning signal, not an employer score or hiring prediction.
-- The roadmap creates an editable topic plan, not a curated list of guaranteed problem links. Progress is saved in the current browser, not to the account.
+- The roadmap creates an editable topic plan, not a curated list of guaranteed problem links. Progress can be stored locally or synchronized to the signed-in account when its saved LeetCode username matches.
 - The Code Review Lab is static pattern matching, not an AST-based compiler, AI code reviewer, execution sandbox or correctness proof. Snippets stay in the browser and are not submitted to LeetMetric APIs.
 - Interview self-assessment ratings are user-entered and saved in the current browser.
 - Next-milestone timing is a linear estimate only when snapshots span at least 7 days and show positive net growth. It can change as pace changes.
@@ -158,6 +161,8 @@ npm run dev
 | EMAIL_FROM | Password reset emails | Verified sender address |
 | APP_URL | Recommended | Canonical public application URL |
 | PASTE_APP_URL | Paste Vault integration | Paste Vault origin |
+| UPSTASH_REDIS_REST_URL | Optional distributed rate limiting | Upstash Redis HTTPS REST URL |
+| UPSTASH_REDIS_REST_TOKEN | Optional distributed rate limiting | Upstash Redis standard server-side token |
 
 Generate a session secret locally:
 
@@ -189,7 +194,10 @@ The Developer Profile page calls a same-origin serverless adapter that retrieves
 | POST | /api/auth/forgot-password | Request reset email |
 | POST | /api/auth/reset-password | Apply single-use password reset |
 | GET / POST | /api/user/profile | Read or save preferred LeetCode username |
-| DELETE | /api/user/account | Delete account and owned workspace data |
+| DELETE | /api/user/account | Delete account and owned workspace data with a verification receipt |
+| GET | /api/user/export | Export private account data as JSON |
+| GET / POST | /api/roadmaps | List or create account-synchronized DSA roadmaps |
+| PATCH / DELETE | /api/roadmaps/:id | Update progress/title or delete an owned roadmap |
 | GET / POST | /api/analytics/snapshots | Read or save daily snapshots |
 | GET / POST | /api/goals | List or create goals |
 | DELETE | /api/goals/:id | Delete an owned goal |
@@ -210,11 +218,11 @@ npm run check
 
 The command performs JavaScript syntax checks and runs Node's built-in test suite. GitHub Actions runs the same command on pushes to main and feature branches and on pull requests targeting main.
 
-Before production growth, add database-backed integration tests, end-to-end browser tests, accessibility automation, shared rate limiting and monitoring. Current in-memory rate limits are per serverless function instance and are not distributed across instances.
+Before production growth, add database-backed integration tests, end-to-end browser tests, accessibility automation, shared rate limiting and monitoring. Without Upstash credentials, rate limiting uses a bounded in-memory fallback scoped to each serverless instance. When both UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are configured, state-changing API limits use an atomic Redis Lua script shared across instances. If Redis is temporarily unavailable, the application logs a sanitized fallback event and uses its local limiter; that degraded mode is not globally distributed.
 
 ## Roadmap
 
-The maintained implementation roadmap lives in docs/PRODUCT-ROADMAP.md. Planned items include durable account-synced roadmaps, user-recorded time-to-solve data, optional server-side AI study coaching, isolated code execution, multi-platform developer integrations, React/Vite migration and distributed caching. These are not represented as shipped features.
+The maintained implementation roadmap lives in docs/PRODUCT-ROADMAP.md. Remaining planned items include end-to-end browser/accessibility tests, richer operations monitoring, an optional server-side AI study coach, isolated code execution, additional platform integrations and any future frontend migration. These are not represented as shipped features.
 
 ## Security and privacy
 
