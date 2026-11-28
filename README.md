@@ -86,6 +86,10 @@ Browser
         |     +-- LeetCode public GraphQL
         |     +-- normalization, bounded cache and request deduplication
         |
+        +-- /api/developer/:platform/:username
+        |     +-- Codeforces public API / GitHub REST API
+        |     +-- allowlisted providers, timeout, bounded cache and request deduplication
+        |
         +-- /api/auth/*
         |     +-- bcryptjs password hashing
         |     +-- JWT in HttpOnly cookie
@@ -174,8 +178,9 @@ Never commit .env, MongoDB credentials, API keys or production secrets.
 | Method | Endpoint | Purpose |
 |---|---|---|
 | GET | /api/leetcode/:username | Public LeetCode profile analytics |
+| GET | /api/developer/:platform/:username | Public Codeforces or GitHub profile overview |
 
-The Developer Profile page calls the official public Codeforces API and GitHub REST API directly from the browser. No API secrets are stored by LeetMetric.
+The Developer Profile page calls a same-origin serverless adapter that retrieves public data from the official Codeforces API and GitHub REST API. The adapter allowlists providers, validates handles, applies timeouts, caches responses and isolates platform errors. No platform API secrets are required or stored by LeetMetric.
 | POST | /api/auth/signup | Create account |
 | POST | /api/auth/login | Start a session |
 | POST | /api/auth/logout | End a session |

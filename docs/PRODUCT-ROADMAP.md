@@ -20,6 +20,7 @@ This roadmap is the source of truth for shipped and planned work. A capability i
 - [x] Side-by-side public profile comparison with difficulty, submissions, topic coverage, activity and contest signals.
 - [x] Shareable comparison links and CSV export.
 - [x] Read-only public developer profile summary for LeetCode, Codeforces and GitHub using public platform endpoints.
+- [x] Same-origin developer platform adapter with provider allowlisting, username validation, upstream timeouts, bounded cache, concurrent-request deduplication and Codeforces pacing.
 - [x] Bounded process-local cache, request deduplication, input validation and upstream timeouts.
 
 ### Personal workspace
@@ -60,7 +61,7 @@ This roadmap is the source of truth for shipped and planned work. A capability i
 - Progress exports include private snapshots only when the signed-in account has saved the selected username.
 - Current rate limits are in-memory per serverless function instance. A shared distributed limiter is required before higher-traffic production use.
 - The frontend remains static HTML/CSS/Vanilla JavaScript with Vercel Node.js functions. React/Vite and an Express service are not part of the current implementation.
-- Codeforces API calls are subject to the platform’s documented request-frequency limit; GitHub public REST requests are subject to unauthenticated rate limits.
+- Codeforces API calls are subject to the platform’s documented request-frequency limit; the serverless adapter adds per-instance pacing and caching, but cannot guarantee a global request schedule across separate serverless instances. GitHub public REST requests are subject to unauthenticated rate limits.
 - GitHub language and star totals use a bounded recent repository sample (up to 100 owner repositories), not all repositories.
 - Codeforces/GitHub username lookups do not prove that those profiles belong to the same person as the LeetCode profile.
 - The Paste Vault integration requires PASTE_APP_URL, shared MongoDB configuration and its own deployment.
