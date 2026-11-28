@@ -18,7 +18,7 @@
     <section class="page-hero">
       <div class="page-kicker">PERSONALIZED PRACTICE</div>
       <h1 class="page-title">A roadmap built around<br><span style="color:var(--page-accent)">your next milestone.</span></h1>
-      <p class="page-lead">Generate a 7-day, 30-day or 90-day practice outline from your public profile. Review the suggested focus areas, adjust the targets and track completion in this browser.</p>
+      <p class="page-lead">Generate a 7-day, 30-day or 90-day practice outline from your public profile. Review the suggested focus areas, adjust the targets and track completion locally or synchronize saved plans to your LeetMetric account.</p>
       <form id="roadmap-form" class="roadmap-form" novalidate>
         <div class="form-field"><label for="roadmap-username">LEETCODE USERNAME</label><input id="roadmap-username" name="username" maxlength="30" autocomplete="off" placeholder="e.g. Naitik_Gupta" required></div>
         <div class="form-field"><label for="roadmap-horizon">PLAN DURATION</label><select id="roadmap-horizon" name="horizonDays"><option value="7">7 days</option><option value="30" selected>30 days</option><option value="90">90 days</option></select></div>
@@ -34,10 +34,10 @@
       </div>
       <div class="roadmap-toolbar">
         <span id="roadmap-progress">0 completed</span>
-        <div><button id="roadmap-save" type="button">Save progress</button><button id="roadmap-export" type="button">Export plan</button></div>
+        <div class="roadmap-toolbar-controls"><select id="roadmap-saved-plans" aria-label="Saved roadmaps"><option value="">Saved plans (sign in to sync)</option></select><button id="roadmap-load-saved" type="button">Load selected</button><button id="roadmap-save" type="button">Save to account</button><button id="roadmap-export" type="button">Export plan</button></div>
       </div>
       <div id="roadmap-weeks" class="roadmap-weeks"></div>
-      <p class="roadmap-footnote">This is an editable planning aid, not an automatically assigned LeetCode problem list. Public topic counts are directional signals and can overlap across tags. Progress is saved in this browser only.</p>
+      <p class="roadmap-footnote">This is an editable planning aid, not an automatically assigned LeetCode problem list. Public topic counts are directional signals and can overlap across tags. Local progress is always available. Sign in and save your preferred LeetCode username to synchronize plans and completion across devices.</p>
     </section>
   </main>
   <div id="site-footer"></div>

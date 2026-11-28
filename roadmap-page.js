@@ -9,6 +9,9 @@
   const weeksHost = document.getElementById("roadmap-weeks");
   let activePlan = null;
   let activeKey = "";
+  let activeRoadmapId = "";
+  let activeUsername = "";
+  let savedRoadmaps = [];
 
   function el(tag, className, text) {
     const element = document.createElement(tag);
@@ -37,10 +40,12 @@
     document.getElementById("roadmap-progress").textContent = complete + " / " + boxes.length + " weeks completed";
   }
 
-  function renderPlan(plan) {
+  function renderPlan(plan, progressOverride, roadmapId) {
     activePlan = plan;
+    activeRoadmapId = roadmapId || "";
+    activeUsername = plan.username;
     activeKey = storageKey(plan.username, plan.horizonDays);
-    const saved = readProgress();
+    const saved = progressOverride && typeof progressOverride === "object" ? progressOverride : readProgress();
     weeksHost.replaceChildren();
     document.getElementById("roadmap-title").textContent = plan.username + " · " + plan.horizonDays + "-day roadmap";
     document.getElementById("roadmap-description").textContent = plan.goal + " " + plan.note;
@@ -90,8 +95,10 @@
       const profile = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(profile.error || "Unable to fetch this profile.");
       const plan = window.LeetMetricIntelligence.createRoadmap(profile, { horizonDays });
+      activeRoadmapId = "";
       renderPlan(plan);
-      setStatus("Roadmap generated. You can adjust the plan and save weekly progress.", "success");
+      await refreshSavedRoadmaps();
+      setStatus("Roadmap generated. Save it to your account or keep a browser-local copy.", "success");
     } catch (error) {
       setStatus(error.message || "Unable to generate a roadmap right now.", "error");
     } finally {
@@ -100,26 +107,108 @@
     }
   });
 
-  document.getElementById("roadmap-save").addEventListener("click", () => {
-    if (!activePlan) return;
+  function currentProgress() {
     const progress = {};
     weeksHost.querySelectorAll("[data-week-check]").forEach((checkbox) => {
       progress[checkbox.dataset.weekCheck] = checkbox.checked;
     });
+    return progress;
+  }
+
+  async function refreshSavedRoadmaps(preferredId) {
+    const select = document.getElementById("roadmap-saved-plans");
+    if (!select || !activeUsername) return;
+    try {
+      const response = await fetch("/api/roadmaps?username=" + encodeURIComponent(activeUsername), {
+        credentials: "same-origin",
+        headers: { Accept: "application/json" }
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        savedRoadmaps = [];
+        select.replaceChildren(el("option", "", response.status === 401
+          ? "Sign in to sync plans"
+          : "Save this username to your account first"));
+        return;
+      }
+      savedRoadmaps = Array.isArray(payload.roadmaps) ? payload.roadmaps : [];
+      select.replaceChildren(el("option", "", "Choose a saved plan"));
+      savedRoadmaps.forEach((item) => {
+        const date = new Date(item.updatedAt);
+        const label = item.title + " · " + item.horizonDays + "d" +
+          (Number.isNaN(date.getTime()) ? "" : " · " + date.toLocaleDateString());
+        const option = el("option", "", label);
+        option.value = item.id;
+        select.append(option);
+      });
+      if (preferredId) select.value = preferredId;
+    } catch {
+      savedRoadmaps = [];
+      select.replaceChildren(el("option", "", "Saved plans unavailable"));
+    }
+  }
+
+  document.getElementById("roadmap-save").addEventListener("click", async () => {
+    if (!activePlan) return;
+    const progress = currentProgress();
     try {
       localStorage.setItem(activeKey, JSON.stringify(progress));
-      setStatus("Your roadmap progress has been saved in this browser.", "success");
-    } catch {
-      setStatus("Browser storage is unavailable. You can still export your plan.", "error");
+    } catch { /* Keep the account-save attempt independent of browser storage. */ }
+
+    const button = document.getElementById("roadmap-save");
+    const original = button.textContent;
+    button.disabled = true;
+    button.textContent = "Saving…";
+    try {
+      const response = await fetch(activeRoadmapId
+        ? "/api/roadmaps/" + encodeURIComponent(activeRoadmapId)
+        : "/api/roadmaps", {
+        method: activeRoadmapId ? "PATCH" : "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(activeRoadmapId ? { progress } : {
+          username: activePlan.username,
+          horizonDays: activePlan.horizonDays,
+          plan: activePlan,
+          progress
+        })
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        if ([401, 409, 503].includes(response.status)) {
+          setStatus("A browser copy was saved. " + (payload.error || "Sign in and save this profile to synchronize it."), "error");
+          return;
+        }
+        throw new Error(payload.error || "Unable to save this roadmap.");
+      }
+      activeRoadmapId = payload.roadmap.id;
+      await refreshSavedRoadmaps(activeRoadmapId);
+      setStatus("Roadmap and weekly completion saved to your LeetMetric account and this browser.", "success");
+    } catch (error) {
+      setStatus("Browser copy saved. Account sync failed: " + (error.message || "please try again."), "error");
+    } finally {
+      button.disabled = false;
+      button.textContent = original;
     }
+  });
+
+  document.getElementById("roadmap-load-saved").addEventListener("click", () => {
+    const id = document.getElementById("roadmap-saved-plans").value;
+    const saved = savedRoadmaps.find((item) => item.id === id);
+    if (!saved) {
+      setStatus("Choose a saved roadmap to load.", "error");
+      return;
+    }
+    activeKey = storageKey(saved.username, saved.horizonDays);
+    usernameInput.value = saved.username;
+    horizonInput.value = String(saved.horizonDays);
+    renderPlan(saved.plan, saved.progress, saved.id);
+    setStatus("Loaded the saved roadmap and its account-synchronized completion state.", "success");
   });
 
   document.getElementById("roadmap-export").addEventListener("click", () => {
     if (!activePlan) return;
-    const progress = {};
-    weeksHost.querySelectorAll("[data-week-check]").forEach((checkbox) => {
-      progress[checkbox.dataset.weekCheck] = checkbox.checked;
-    });
+    const progress = currentProgress();
     const blob = new Blob([JSON.stringify({ ...activePlan, progress }, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const link = el("a");
