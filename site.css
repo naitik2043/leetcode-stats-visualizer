@@ -286,3 +286,7 @@ body { background: var(--bg); color: var(--text); transition: background-color .
 }
 :root[data-theme="light"] .brand-mark span { color: #557b27; }
 :root[data-theme="light"] .target-ring { border-color: var(--page-accent); }
+
+/* Public profile freshness states are shared by lookup, comparison and analysis pages. */
+.status-message.warning,.intel-status.warning,.roadmap-status.warning,.readiness-status.warning,.report-status.warning,.developer-status.warning{color:#b78235;border-color:color-mix(in srgb,#b78235 35%,var(--page-line))}
+@media(prefers-reduced-motion:reduce){.status-message,.intel-status,.roadmap-status,.readiness-status,.report-status,.developer-status{transition:none!important}}
