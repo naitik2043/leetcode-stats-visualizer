@@ -19,6 +19,7 @@ This roadmap is the source of truth for shipped and planned work. A capability i
 - [x] Tag-level topic solved counts, with explicit overlap and non-mastery caveats.
 - [x] Side-by-side public profile comparison with difficulty, submissions, topic coverage, activity and contest signals.
 - [x] Shareable comparison links and CSV export.
+- [x] Read-only public developer profile summary for LeetCode, Codeforces and GitHub using public platform endpoints.
 - [x] Bounded process-local cache, request deduplication, input validation and upstream timeouts.
 
 ### Personal workspace
@@ -59,6 +60,9 @@ This roadmap is the source of truth for shipped and planned work. A capability i
 - Progress exports include private snapshots only when the signed-in account has saved the selected username.
 - Current rate limits are in-memory per serverless function instance. A shared distributed limiter is required before higher-traffic production use.
 - The frontend remains static HTML/CSS/Vanilla JavaScript with Vercel Node.js functions. React/Vite and an Express service are not part of the current implementation.
+- Codeforces API calls are subject to the platform’s documented request-frequency limit; GitHub public REST requests are subject to unauthenticated rate limits.
+- GitHub language and star totals use a bounded recent repository sample (up to 100 owner repositories), not all repositories.
+- Codeforces/GitHub username lookups do not prove that those profiles belong to the same person as the LeetCode profile.
 - The Paste Vault integration requires PASTE_APP_URL, shared MongoDB configuration and its own deployment.
 
 ## Planned work
@@ -80,7 +84,8 @@ This roadmap is the source of truth for shipped and planned work. A capability i
 - [ ] Add company-specific preparation only with a maintained, licensed or otherwise reliable question data source.
 
 ### P3 — Developer ecosystem
-- [ ] Add CodeChef, Codeforces, AtCoder, GeeksforGeeks and GitHub integrations where stable public APIs or permitted data sources exist.
+- [ ] Extend the existing Codeforces/GitHub public profile overview with deeper historical and repository analytics where platform limits permit.
+- [ ] Add CodeChef, AtCoder and GeeksforGeeks integrations where stable public APIs or permitted data sources exist.
 - [ ] Add profile ownership verification and explicit connection/disconnection controls.
 - [ ] Build a unified developer profile with source attribution and duplicate-problem handling.
 - [ ] Add public challenges, leaderboards and social features only with moderation, reporting and privacy controls.

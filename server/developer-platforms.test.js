@@ -19,7 +19,7 @@ test("normalizes a public Codeforces user without inventing unrated values", () 
   assert.equal(result.rating, 3900);
   assert.equal(result.maxRating, 4000);
   assert.equal(result.rank, "legendary grandmaster");
-  assert.match(result.url, /codeforces.com\\/profile\\/tourist/);
+  assert.equal(result.url, "https://codeforces.com/profile/tourist");
 });
 
 test("handles Codeforces unrated accounts and failed responses", () => {
