@@ -142,6 +142,7 @@ async function handleAccountDeletion(req, res) {
     await connectToDatabase();
     const sessionUser = await getSessionUser(req);
     if (!sessionUser) return json(res, 401, { error: "Sign in again before deleting your account." });
+    if (!await rateLimitShared(req, res, "account-deletion", 5, 60 * 60 * 1000)) return;
 
     const user = await User.findById(sessionUser._id).select("+passwordHash");
     if (!user) {
@@ -197,8 +198,7 @@ async function handleAccountDeletion(req, res) {
         : "The deletion transaction completed but verification found remaining records. Contact support before creating a new account.",
       verification
     });  } catch (error) {
-    if (isConfigurationError(error)) {
-      return sendConfigurationError(res, "Account deletion is unavailable until account storage is configured.");
+    if (isConfigurationError(error)) {      return sendConfigurationError(res, "Account deletion is unavailable until account storage is configured.");
     }
     logFailure("account_deletion_failed", error);
     return json(res, 500, {
@@ -397,8 +397,7 @@ async function handleSnapshots(req, res) {
     } catch (error) {
       // Resolve concurrent requests racing against the unique daily snapshot index.      if (error.code !== 11000) throw error;
       snapshot = await ProfileSnapshot.findOneAndUpdate(filter, { $set: update.$set }, {
-        new: true,
-        runValidators: true
+        new: true,        runValidators: true
       }).lean();
     }
 
@@ -597,8 +596,7 @@ async function handleRevisions(req, res) {
       const items = await RevisionItem.find({ userId: user._id, usernameKey })        .sort({ updatedAt: -1 }).limit(100).lean();
       return json(res, 200, {
         username: user.leetcodeUsername,
-        revisions: items.map(revisionPayload),
-        limit: 100
+        revisions: items.map(revisionPayload),        limit: 100
       });
     }
 
