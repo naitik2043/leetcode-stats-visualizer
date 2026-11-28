@@ -766,6 +766,20 @@ async function handleRoadmapItem(req, res, id) {
 
     const current = await Roadmap.findOne(filter).lean();
     if (!current) return json(res, 404, { error: "Saved roadmap not found." });
+    const currentVersion = Number(current.version) || 1;
+    if (req.body?.version !== undefined) {
+      const expectedVersion = Number(req.body.version);
+      if (!Number.isSafeInteger(expectedVersion) || expectedVersion < 1) {
+        return json(res, 400, { error: "Roadmap version must be a positive whole number." });
+      }
+      if (expectedVersion !== currentVersion) {
+        return json(res, 409, {
+          error: "This roadmap changed in another session. Reload the saved version before editing it.",
+          code: "ROADMAP_VERSION_CONFLICT",
+          roadmap: roadmapPayload(current)
+        });
+      }
+    }
     let update;
     try {
       update = normalizeRoadmapUpdate(req.body || {}, current.plan.weeks.length);
@@ -773,10 +787,16 @@ async function handleRoadmapItem(req, res, id) {
       return json(res, 400, { error: error.message || "Invalid roadmap update." });
     }
     const roadmap = await Roadmap.findOneAndUpdate(
-      filter,
+      { ...filter, version: currentVersion },
       { $set: update, $inc: { version: 1 } },
       { new: true, runValidators: true }
     ).lean();
+    if (!roadmap) {
+      return json(res, 409, {
+        error: "This roadmap was updated at the same time by another session. Reload the saved version and retry.",
+        code: "ROADMAP_VERSION_CONFLICT"
+      });
+    }
     return json(res, 200, { message: "Saved roadmap updated.", roadmap: roadmapPayload(roadmap) });
   } catch (error) {
     if (isConfigurationError(error)) return sendConfigurationError(res, "Roadmap synchronization is unavailable until account storage is configured.");

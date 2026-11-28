@@ -27,3 +27,5 @@
 .roadmap-toolbar-controls select{max-width:230px;min-width:170px;padding:9px 10px;border:1px solid var(--page-line);border-radius:7px;background:var(--surface-input);color:var(--field-text);font:10px var(--page-font)}
 .roadmap-toolbar-controls button:disabled{opacity:.55;cursor:wait}
 @media(max-width:650px){.roadmap-toolbar-controls{width:100%;display:grid;grid-template-columns:1fr 1fr}.roadmap-toolbar-controls select{grid-column:1/-1;max-width:none;width:100%}}
+
+.roadmap-toolbar-controls button:disabled{opacity:.5;cursor:not-allowed}

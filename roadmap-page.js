@@ -10,6 +10,7 @@
   let activePlan = null;
   let activeKey = "";
   let activeRoadmapId = "";
+  let activeRoadmapVersion = 0;
   let activeUsername = "";
   let savedRoadmaps = [];
 
@@ -40,9 +41,10 @@
     document.getElementById("roadmap-progress").textContent = complete + " / " + boxes.length + " weeks completed";
   }
 
-  function renderPlan(plan, progressOverride, roadmapId) {
+  function renderPlan(plan, progressOverride, roadmapId, version) {
     activePlan = plan;
     activeRoadmapId = roadmapId || "";
+    activeRoadmapVersion = Number(version) || 0;
     activeUsername = plan.username;
     activeKey = storageKey(plan.username, plan.horizonDays);
     const saved = progressOverride && typeof progressOverride === "object" ? progressOverride : readProgress();
@@ -166,7 +168,7 @@
         method: activeRoadmapId ? "PATCH" : "POST",
         credentials: "same-origin",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(activeRoadmapId ? { progress } : {
+        body: JSON.stringify(activeRoadmapId ? { progress, version: activeRoadmapVersion } : {
           username: activePlan.username,
           horizonDays: activePlan.horizonDays,
           plan: activePlan,
@@ -175,6 +177,11 @@
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
+        if (payload.code === "ROADMAP_VERSION_CONFLICT") {
+          setStatus(payload.error + " Use Load selected to refresh your copy.", "error");
+          await refreshSavedRoadmaps(activeRoadmapId);
+          return;
+        }
         if ([401, 409, 503].includes(response.status)) {
           setStatus("A browser copy was saved. " + (payload.error || "Sign in and save this profile to synchronize it."), "error");
           return;
@@ -182,6 +189,7 @@
         throw new Error(payload.error || "Unable to save this roadmap.");
       }
       activeRoadmapId = payload.roadmap.id;
+      activeRoadmapVersion = Number(payload.roadmap.version) || 1;
       await refreshSavedRoadmaps(activeRoadmapId);
       setStatus("Roadmap and weekly completion saved to your LeetMetric account and this browser.", "success");
     } catch (error) {
@@ -202,8 +210,36 @@
     activeKey = storageKey(saved.username, saved.horizonDays);
     usernameInput.value = saved.username;
     horizonInput.value = String(saved.horizonDays);
-    renderPlan(saved.plan, saved.progress, saved.id);
+    renderPlan(saved.plan, saved.progress, saved.id, saved.version);
     setStatus("Loaded the saved roadmap and its account-synchronized completion state.", "success");
+  });
+
+
+  document.getElementById("roadmap-delete-saved").addEventListener("click", async () => {
+    if (!activeRoadmapId) {
+      setStatus("Load an account-saved roadmap before deleting it.", "error");
+      return;
+    }
+    if (!window.confirm("Delete this saved roadmap and its synchronized completion state? This cannot be undone.")) return;
+    const button = document.getElementById("roadmap-delete-saved");
+    button.disabled = true;
+    try {
+      const response = await fetch("/api/roadmaps/" + encodeURIComponent(activeRoadmapId), {
+        method: "DELETE",
+        credentials: "same-origin",
+        headers: { Accept: "application/json" }
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || "Unable to delete this saved roadmap.");
+      activeRoadmapId = "";
+      activeRoadmapVersion = 0;
+      await refreshSavedRoadmaps();
+      setStatus("Saved roadmap deleted. The current plan remains on screen as a local working copy.", "success");
+    } catch (error) {
+      setStatus(error.message || "Unable to delete this saved roadmap.", "error");
+    } finally {
+      button.disabled = false;
+    }
   });
 
   document.getElementById("roadmap-export").addEventListener("click", () => {
