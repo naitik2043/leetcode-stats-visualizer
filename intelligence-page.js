@@ -7,6 +7,7 @@
   const status = document.getElementById("intel-status");
   const results = document.getElementById("intel-results");
   const number = (value) => Number(value || 0).toLocaleString();
+  let mistakeRequestId = 0;
 
   function node(tag, className, text) {
     const item = document.createElement(tag);
@@ -85,6 +86,55 @@
     params.set("username", report.username);
     window.history.replaceState({}, "", window.location.pathname + "?" + params.toString());
     try { localStorage.setItem("leetmetric-last-username", report.username); } catch { /* Storage is optional. */ }
+    loadMistakePatterns();
+  }
+
+  async function loadMistakePatterns() {
+    const requestId = ++mistakeRequestId;
+    const statusNode = document.getElementById("intel-mistake-status");
+    const content = document.getElementById("intel-mistake-content");
+    const types = document.getElementById("intel-mistake-types");
+    if (!statusNode || !content || !types) return;
+    content.hidden = true;
+    statusNode.textContent = "Loading private revision patterns…";
+    try {
+      const response = await fetch("/api/revisions", {
+        headers: { Accept: "application/json" },
+        credentials: "same-origin"
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (requestId !== mistakeRequestId) return;
+      if (response.status === 401 || response.status === 409) {
+        statusNode.textContent = "Sign in and save your preferred LeetCode username to analyze your private revision queue.";
+        return;
+      }
+      if (!response.ok) throw new Error(payload.error || "Unable to load revision insights.");
+      const summary = window.LeetMetricIntelligence.summarizeMistakes(payload.revisions || []);
+      if (!summary.total) {
+        statusNode.textContent = "Your revision queue is empty. Add problems and record why you want to revisit them to build mistake-pattern insights.";
+        return;
+      }
+      statusNode.textContent = "Aggregated from your private revision items. These counts reflect what you recorded, not every submission you made.";
+      content.hidden = false;
+      document.getElementById("intel-mistake-total").textContent = number(summary.total);
+      document.getElementById("intel-mistake-open").textContent = number(summary.open);
+      document.getElementById("intel-mistake-mastered").textContent = number(summary.mastered);
+      types.replaceChildren();
+      summary.byType.forEach((item) => {
+        const row = node("div", "intel-mistake-type");
+        const heading = node("div", "intel-mistake-type-heading");
+        heading.append(node("span", "", item.type.replace(/-/g, " ")), node("strong", "", number(item.count)));
+        const track = node("div", "intel-component-track");
+        const fill = node("span");
+        fill.style.width = Math.round((item.count / summary.total) * 100) + "%";
+        track.append(fill);
+        row.append(heading, track);
+        types.append(row);
+      });
+    } catch (error) {
+      if (requestId !== mistakeRequestId) return;
+      statusNode.textContent = error.message || "Revision insights are temporarily unavailable.";
+    }
   }
 
   async function analyze(username) {
