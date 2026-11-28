@@ -4,8 +4,10 @@ const {
   LEETCODE_CORE_PROFILE_QUERY,
   normalizeLeetCodeProfile
 } = require("../../server/leetcode");
+const { cacheMetadata } = require("../../server/cache-policy");
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
+const STALE_TTL_MS = 60 * 60 * 1000;
 const MAX_CACHE_ENTRIES = 500;
 const cache = new Map();
 const inFlight = new Map();
@@ -13,18 +15,23 @@ const inFlight = new Map();
 function readCache(key, now = Date.now()) {
   const entry = cache.get(key);
   if (!entry) return null;
-  if (entry.expiresAt <= now) {
+  if (entry.staleUntil <= now) {
     cache.delete(key);
     return null;
   }
   cache.delete(key);
   cache.set(key, entry);
-  return entry.data;
+  return {
+    data: entry.data,
+    fetchedAtMs: entry.fetchedAtMs,
+    fresh: entry.freshUntil > now,
+    metadata: cacheMetadata(entry.fetchedAtMs, now, CACHE_TTL_MS, STALE_TTL_MS)
+  };
 }
 
 function writeCache(key, data, now = Date.now()) {
   for (const [cachedKey, entry] of cache) {
-    if (entry.expiresAt <= now) cache.delete(cachedKey);
+    if (entry.staleUntil <= now) cache.delete(cachedKey);
   }
   cache.delete(key);
   while (cache.size >= MAX_CACHE_ENTRIES) {
@@ -32,7 +39,26 @@ function writeCache(key, data, now = Date.now()) {
     if (oldestKey === undefined) break;
     cache.delete(oldestKey);
   }
-  cache.set(key, { data, expiresAt: now + CACHE_TTL_MS });
+  cache.set(key, {
+    data,
+    fetchedAtMs: now,
+    freshUntil: now + CACHE_TTL_MS,
+    staleUntil: now + STALE_TTL_MS
+  });
+}
+
+function responseProfile(data, metadata, state) {
+  return {
+    ...data,
+    cache: {
+      ...metadata,
+      state: state || metadata.state,
+      stale: state ? state !== "fresh" : metadata.stale,
+      warning: state && state !== "fresh"
+        ? "Live profile refresh failed. Showing a previously fetched public snapshot."
+        : null
+    }
+  };
 }
 
 async function requestLeetCode(query, username) {
@@ -58,12 +84,9 @@ async function requestLeetCode(query, username) {
 
 async function fetchLeetCodeProfile(username) {
   const payload = await requestLeetCode(LEETCODE_PROFILE_QUERY, username);
-
-  // LeetCode can return HTTP 200 with GraphQL errors for an unknown profile.
   if (payload && payload.data && payload.data.matchedUser === null) return null;
 
   if (payload && payload.errors && payload.errors.length) {
-    // A newly added analytics field may change without notice. Keep core stats usable.
     const fallback = await requestLeetCode(LEETCODE_CORE_PROFILE_QUERY, username);
     if (fallback && fallback.data && fallback.data.matchedUser) {
       return normalizeLeetCodeProfile(username, fallback.data);
@@ -84,7 +107,6 @@ async function fetchLeetCodeProfile(username) {
 
 module.exports = async function handler(req, res) {
   res.setHeader("Cache-Control", "public, s-maxage=60, stale-while-revalidate=120");
-
   if (req.method !== "GET") {
     res.setHeader("Allow", "GET");
     return res.status(405).json({ error: "Method not allowed." });
@@ -102,7 +124,10 @@ module.exports = async function handler(req, res) {
 
   const cacheKey = username.toLowerCase();
   const cached = readCache(cacheKey);
-  if (cached) return res.status(200).json(cached);
+  if (cached && cached.fresh) {
+    res.setHeader("X-LeetMetric-Data-State", "fresh");
+    return res.status(200).json(responseProfile(cached.data, cached.metadata, "fresh"));
+  }
 
   try {
     let request = inFlight.get(cacheKey);
@@ -110,12 +135,21 @@ module.exports = async function handler(req, res) {
       request = fetchLeetCodeProfile(username);
       inFlight.set(cacheKey, request);
     }
-
     const data = await request;
     if (!data) return res.status(404).json({ error: "Public LeetCode profile not found." });
     writeCache(cacheKey, data);
-    return res.status(200).json(data);
+    const fresh = readCache(cacheKey);
+    res.setHeader("X-LeetMetric-Data-State", "fresh");
+    return res.status(200).json(responseProfile(data, fresh.metadata, "fresh"));
   } catch (error) {
+    const fallback = readCache(cacheKey);
+    const isTransient = error.name === "TimeoutError" || error.name === "AbortError" ||
+      error.code === "LEETCODE_UPSTREAM_STATUS" || error.code === "LEETCODE_UPSTREAM_PAYLOAD";
+    if (fallback && isTransient) {
+      res.setHeader("X-LeetMetric-Data-State", "stale-if-error");
+      res.setHeader("Warning", '110 - "Response is stale"');
+      return res.status(200).json(responseProfile(fallback.data, fallback.metadata, "stale-if-error"));
+    }
     if (error.name === "TimeoutError" || error.name === "AbortError") {
       return res.status(504).json({ error: "LeetCode took too long to respond. Please try again." });
     }
