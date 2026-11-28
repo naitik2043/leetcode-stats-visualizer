@@ -8,6 +8,7 @@ const Goal = require("../models/Goal");
 const RevisionItem = require("../models/RevisionItem");
 const CodePaste = require("../models/CodePaste");
 const IntegrationTicket = require("../models/IntegrationTicket");
+const Roadmap = require("../models/Roadmap");
 const {
   json,
   getSessionUser,
@@ -27,6 +28,7 @@ const {
   normalizeRevisionCreate,
   normalizeRevisionUpdate
 } = require("../revisions");
+const { normalizeRoadmapInput, normalizeRoadmapUpdate } = require("../roadmaps");
 
 function isConfigurationError(error) {
   return error.code === "DATABASE_NOT_CONFIGURED" || error.code === "AUTH_NOT_CONFIGURED";
@@ -114,6 +116,7 @@ async function handleAccountDeletion(req, res) {
         await RevisionItem.deleteMany({ userId: user._id }, { session });
         await CodePaste.deleteMany({ userId: user._id }, { session });
         await IntegrationTicket.deleteMany({ userId: user._id }, { session });
+        await Roadmap.deleteMany({ userId: user._id }, { session });
         await User.deleteOne({ _id: user._id }, { session });
       });
     } finally {
@@ -512,12 +515,117 @@ async function handleRevisionItem(req, res, id) {
   }
 }
 
+
+function roadmapPayload(item) {
+  return {
+    id: String(item._id),
+    username: item.username,
+    title: item.title,
+    horizonDays: item.horizonDays,
+    plan: item.plan,
+    progress: item.progress || {},
+    version: item.version || 1,
+    createdAt: item.createdAt,
+    updatedAt: item.updatedAt
+  };
+}
+
+async function handleRoadmaps(req, res) {
+  if (req.method !== "GET" && req.method !== "POST") return methodNotAllowed(req, res, "GET, POST");
+  if (req.method === "POST" && !enforceSameOrigin(req, res)) return;
+  if (req.method === "POST" && !rateLimit(req, res, "roadmaps", 20, 60 * 60 * 1000)) return;
+
+  try {
+    await connectToDatabase();
+    const user = await getSessionUser(req);
+    if (!user) return json(res, 401, { error: "Sign in to synchronize roadmaps across devices." });
+    if (!user.leetcodeUsername) {
+      return json(res, 409, { error: "Save your preferred LeetCode username before synchronizing roadmaps." });
+    }
+    const usernameKey = user.leetcodeUsername.toLowerCase();
+
+    if (req.method === "GET") {
+      const requestedUsername = String(req.query?.username || user.leetcodeUsername).trim();
+      if (!USERNAME_PATTERN.test(requestedUsername) || requestedUsername.toLowerCase() !== usernameKey) {
+        return json(res, 409, { error: "Roadmaps are available only for the LeetCode username saved to this account." });
+      }
+      const items = await Roadmap.find({ userId: user._id, usernameKey })
+        .sort({ updatedAt: -1 }).limit(20).lean();
+      return json(res, 200, {
+        username: user.leetcodeUsername,
+        roadmaps: items.map(roadmapPayload),
+        limit: 20
+      });
+    }
+
+    let normalized;
+    try {
+      normalized = normalizeRoadmapInput(req.body || {});
+    } catch (error) {
+      return json(res, 400, { error: error.message || "Invalid roadmap." });
+    }
+    if (normalized.usernameKey !== usernameKey) {
+      return json(res, 409, { error: "Save this LeetCode username in your profile settings before synchronizing its roadmap." });
+    }
+    const count = await Roadmap.countDocuments({ userId: user._id, usernameKey });
+    if (count >= 20) {
+      return json(res, 409, { error: "You have reached the 20-roadmap limit. Delete an older roadmap before saving another." });
+    }
+    const item = await Roadmap.create({ ...normalized, userId: user._id });
+    return json(res, 201, { message: "Roadmap saved to your LeetMetric account.", roadmap: roadmapPayload(item) });
+  } catch (error) {
+    if (isConfigurationError(error)) return sendConfigurationError(res, "Roadmap synchronization is unavailable until account storage is configured.");
+    logFailure("roadmap_list_or_create_failed", error);
+    return json(res, 500, { error: "Unable to load or save your roadmaps right now." });
+  }
+}
+
+async function handleRoadmapItem(req, res, id) {
+  if (req.method !== "PATCH" && req.method !== "DELETE") return methodNotAllowed(req, res, "PATCH, DELETE");
+  if (!enforceSameOrigin(req, res)) return;
+  if (!mongoose.isValidObjectId(id)) return json(res, 400, { error: "Invalid roadmap identifier." });
+
+  try {
+    await connectToDatabase();
+    const user = await getSessionUser(req);
+    if (!user) return json(res, 401, { error: "Sign in to manage saved roadmaps." });
+    const filter = { _id: id, userId: user._id };
+
+    if (req.method === "DELETE") {
+      const deleted = await Roadmap.findOneAndDelete(filter);
+      if (!deleted) return json(res, 404, { error: "Saved roadmap not found." });
+      return json(res, 200, { ok: true, message: "Saved roadmap deleted." });
+    }
+
+    const current = await Roadmap.findOne(filter).lean();
+    if (!current) return json(res, 404, { error: "Saved roadmap not found." });
+    let update;
+    try {
+      update = normalizeRoadmapUpdate(req.body || {}, current.plan.weeks.length);
+    } catch (error) {
+      return json(res, 400, { error: error.message || "Invalid roadmap update." });
+    }
+    const roadmap = await Roadmap.findOneAndUpdate(
+      filter,
+      { $set: update, $inc: { version: 1 } },
+      { new: true, runValidators: true }
+    ).lean();
+    return json(res, 200, { message: "Saved roadmap updated.", roadmap: roadmapPayload(roadmap) });
+  } catch (error) {
+    if (isConfigurationError(error)) return sendConfigurationError(res, "Roadmap synchronization is unavailable until account storage is configured.");
+    logFailure("roadmap_update_or_delete_failed", error);
+    return json(res, 500, { error: "Unable to update this saved roadmap right now." });
+  }
+}
+
 module.exports = async function workspaceHandler(req, res) {
   const rawPath = req.query?.path;
   const segments = (Array.isArray(rawPath) ? rawPath : [rawPath])
     .filter((part) => typeof part === "string" && part.length > 0);
 
   if (segments.length === 1 && segments[0] === "profile") return handleProfile(req, res);
+  if (segments.length === 1 && segments[0] === "roadmaps") return handleRoadmaps(req, res);
+  if (segments.length === 2 && segments[0] === "roadmaps") return handleRoadmapItem(req, res, segments[1]);
   if (segments.length === 1 && segments[0] === "account") return handleAccountDeletion(req, res);
   if (segments.length === 1 && segments[0] === "snapshots") return handleSnapshots(req, res);
   if (segments.length === 1 && segments[0] === "goals") return handleGoals(req, res);

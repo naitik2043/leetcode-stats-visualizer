@@ -51,6 +51,14 @@
     {
       "source": "/api/revisions/:id",
       "destination": "/api/workspace/revisions/:id"
+    },
+    {
+      "source": "/api/roadmaps",
+      "destination": "/api/workspace/roadmaps"
+    },
+    {
+      "source": "/api/roadmaps/:id",
+      "destination": "/api/workspace/roadmaps/:id"
     }
   ]
 }
