@@ -200,21 +200,26 @@
     const fallbackTopics = ["Arrays & Strings", "Binary Search", "Linked Lists", "Trees", "Graphs", "Dynamic Programming"];
     const topics = lowTopics.length ? lowTopics : fallbackTopics;
     const focusDifficulty = profile.stats.solved.medium < profile.stats.solved.easy ? "Medium" : "Hard";
+    const requestedDays = Number(options && options.horizonDays);
+    const horizonDays = [7, 30, 90].includes(requestedDays) ? requestedDays : 42;
+    const weekCount = Math.ceil(horizonDays / 7);
     const weeks = [];
-    for (let index = 0; index < 6; index += 1) {
+    for (let index = 0; index < weekCount; index += 1) {
       const topic = topics[index % topics.length];
       const secondary = topics[(index + 1) % topics.length];
+      const earlyWeek = index < 2;
+      const target = horizonDays === 7 ? 4 : earlyWeek ? 8 : 10;
       weeks.push({
         week: index + 1,
         title: "Week " + (index + 1) + " — " + topic,
         focus: topic,
         secondary,
-        target: index < 2 ? 8 : 10,
-        difficulty: index < 2 ? "Easy → Medium" : focusDifficulty,
+        target,
+        difficulty: earlyWeek ? "Easy → Medium" : focusDifficulty,
         tasks: [
           "Review the core pattern and write a short note.",
-          "Solve " + (index < 2 ? 5 : 6) + " problems on " + topic + ".",
-          "Solve " + (index < 2 ? 3 : 4) + " problems on " + secondary + ".",
+          "Solve " + Math.ceil(target * 0.6) + " problems on " + topic + ".",
+          "Solve " + Math.floor(target * 0.4) + " problems on " + secondary + ".",
           "Revisit one previously incorrect or queued problem."
         ]
       });
@@ -222,8 +227,10 @@
     return {
       generatedAt: new Date().toISOString(),
       username: insights.username,
+      horizonDays,
       goal: "Build a more balanced and consistent DSA practice routine.",
       weeks,
+      estimatedProblemTarget: weeks.reduce((sum, week) => sum + week.target, 0),
       note: "This roadmap uses public tag counts as directional signals. Confirm topic availability and adjust targets to your schedule."
     };
   }
